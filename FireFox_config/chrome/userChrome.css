@@ -1,0 +1,7 @@
+#urlbar-input {
+  color: var(--user-urlbar-color) !important; 
+  font-family: var(--user-urlbar-results-font-family) !important; 
+  font-weight: var(--user-urlbar-results-font-weight)!important; 
+  text-align: center !important; 
+} 
+

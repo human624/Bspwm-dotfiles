@@ -1,0 +1,139 @@
+#
+# Основные действия
+#
+
+# Перезагружает конфигурацию sxhkd:
+super + Escape + r
+    pkill -USR1 -x sxhkd; notify-send 'sxhkd' 'Config restarted' -t 1500
+	
+# Запуск терминала
+super + Return
+    alacritty
+
+# Показать/Скрыть Polybar
+super + p
+	sh $HOME/.local/Bspwm/bin/toggle-polybar
+
+# Set random wallpaper
+super + w
+	sh $HOME/.local/Bspwm/bin/random_wallpaper
+
+# Изменить язык
+Alt_L + shift
+	sh $HOME/.local/Bspwm/bin/change_language.sh
+
+Shift_L + alt
+	sh $HOME/.local/Bspwm/bin/change_language.sh
+    
+# Открыть rofi меню
+super + d
+    {rofi -show drun}
+    
+super + x
+    {sh $HOME/.local/Bspwm/bin/powermenu}
+
+# Запуск приложений
+super + shift + {f,n,p,i,l}
+	{firefox, \
+	thunar, \
+	pavucontrol, \
+	firefox --private-window, \
+	sh $HOME/.local/Bspwm/bin/screen-lock}
+     
+# Изменение громкости через fn    
+XF86AudioRaiseVolume
+    sh $HOME/.local/Bspwm/bin/volume volume-up
+
+XF86AudioLowerVolume
+    sh $HOME/.local/Bspwm/bin/volume volume-down
+
+XF86AudioMute
+    sh $HOME/.local/Bspwm/bin/volume toggle-mute
+
+# Изменение яркости через fn 
+XF86MonBrightnessUp
+    sh $HOME/.local/Bspwm/bin/volume brightness-up
+
+XF86MonBrightnessDown
+    sh $HOME/.local/Bspwm/bin/volume brightness-down
+
+# Снимок экрана
+Print
+    xfce4-screenshooter
+
+#
+# Горячие клавиши BSPWM
+#
+
+# Выключить/Перезагрузить bspwm
+ctrl + shift + {q,r}
+    bspc {quit,wm -r}
+
+# Принудительно закрыть окно
+super + c
+    bspc node -c
+
+# Переключение между плиточным и монокль-режимом
+super + space
+	bspc node -t "~"{floating,tiled}
+
+#
+# Состояние/Флаги
+#
+
+# Установить состояние окна
+super + {t,ctrl + t,f}
+	bspc node -t {tiled,pseudo_tiled,fullscreen}
+	
+
+# Переключиться на следующее окно, включая плавающее
+alt + {_,shift + }Tab
+    bspc node -f {next.local,prev.local}
+
+#
+# Фокус/Обмен
+#
+
+# Фокус на последнем окне/рабочем столе
+super + {grave,Tab}
+	bspc {node,desktop} -f last
+
+# Отправить текущее окно на текущий рабочий стол
+super + {_,shift + }{1-9,0}
+	bspc {desktop -f,node -d} '^{1-9,10}'
+
+#
+# Предварительный выбор
+#
+
+# Предварительно установить соотношение
+super + ctrl + {1-9}
+	bspc node -o 0.{1-9}
+
+# Отменить предварительное соотношение для активного окна
+super + ctrl + space
+	bspc node -p cancel
+
+# Отменить предварительное соотношение для активного рабочего стола
+super + ctrl + shift + space
+	bspc query -N -d | xargs -I id -n 1 bspc node id -p cancel
+
+#
+# перемещение/изменение размера
+#
+
+# Расширение окна
+super + control {h,j,k,l}
+    bspc node -z {left -20 0,right 20 0,top 0 -20,bottom 0 20} 
+
+# Отправить окно на другой край экрана
+super + {_,alt + }{h,j,k,l}
+    bspc node -{f,s} {west,south,north,east}
+
+# Установить флаги окна
+super + ctrl + {m,x,y,z}
+	bspc node -g {marked,locked,sticky,private}
+
+# Поменять текущее окно с самым большим окном
+super + g
+	bspc node -s biggest.window

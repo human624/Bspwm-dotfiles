@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# === Создаём меню через rofi ===
+choice=$(printf " Shutdown\n Reboot\n󰤄 Suspend\n Lock\n Logout" | rofi -dmenu -i -p "Power Menu:")
+
+# === Выполняем действие в зависимости от выбора ===
+case "$choice" in
+  " Shutdown") systemctl poweroff ;;
+  " Reboot") systemctl reboot ;;
+  "󰤄 Suspend") systemctl suspend && sh $HOME/.local/Bspwm/bin/screen-lock ;;
+  " Lock") sh $HOME/.local/Bspwm/bin/screen-lock ;;
+  " Logout") pkill -KILL -u "$USER" ;;
+esac
