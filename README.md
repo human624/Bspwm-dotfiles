@@ -9,6 +9,8 @@ Join hundreds of users who enjoy **fast, organized, and elegant workspace manage
 
 <img src="Demonstration/1.png" alt="rice" align="right" width="500px">
 
+</br>
+
 - **OS:** EndeavourOS  
 - **WM:** Bspwm  
 - **Bar:** Polybar  
@@ -18,7 +20,7 @@ Join hundreds of users who enjoy **fast, organized, and elegant workspace manage
 - **App Launcher:** Rofi  
 - **Notify Daemon:** Dunst  
 
-
+</br>
 
 ## 📸 Desktop Preview
 
