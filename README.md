@@ -5,9 +5,9 @@ These dotfiles are lightweight, fully customizable, and ready to use — perfect
 
 Join hundreds of users who enjoy **fast, organized, and elegant workspace management** with this setup!
 
-<img src="Demonstration/1.png" alt="rice" align="right" width="500px">
-
 ## 🖥️ System Overview
+
+<img src="Demonstration/1.png" alt="rice" align="right" width="500px">
 
 - **OS:** EndeavourOS  
 - **WM:** Bspwm  
