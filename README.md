@@ -18,6 +18,8 @@ Join hundreds of users who enjoy **fast, organized, and elegant workspace manage
 - **App Launcher:** Rofi  
 - **Notify Daemon:** Dunst  
 
+
+
 ## 📸 Desktop Preview
 
 ![Desktop Screenshot](Demonstration/1.png)
