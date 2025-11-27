@@ -38,8 +38,7 @@ xrdb merge ~/.Xresources
 sh $HOME/.local/Bspwm/bin/random_wallpaper
 
 # Run polybar
-#sh ~/.config/polybar/launch.sh
-sh $HOME/.local/Bspwm/bin/toggle-polybar
+sh ~/.config/polybar/launch.sh
 
 # launch notification daemon
 dunst -config $HOME/.config/bspwm/dunstrc &
