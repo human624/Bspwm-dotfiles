@@ -49,6 +49,19 @@ Join hundreds of users who enjoy **fast, organized, and elegant workspace manage
 - Polybar and scripts are pre-configured  
 - Customize colors, fonts, and scripts in `~/.Bspwm-dotfiles`  
 
+## 🛠️ Installer
+
+To make the setup process as smooth and effortless as possible, a dedicated **Installer** folder has been added.  
+Inside, you'll find a **fully automated installation script** that handles all required dependencies for the complete Bspwm-dotfiles environment — from the window manager itself to essential tools, utilities, and supporting components.
+
+All you need to do is open the **Installer** folder and run the following command:
+```sh
+python3 install.py
+```
+The script will automatically install everything you need within minutes, saving you from manually searching for, tracking, and installing each package one by one.
+
+This provides a **fast, seamless, and hassle-free installation experience**, allowing you to dive straight into customizing and enjoying your optimized desktop environment.
+
 ## 🙏 Acknowledgements
 
 Special thanks to **[ZProger](https://www.youtube.com/@ZProger)** for inspiration and many configuration ideas used in this setup.
