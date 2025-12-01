@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+ranger-cd() {
+  tempfile="$(mktemp -t tmp.XXXXXX)"
+  /usr/bin/ranger --choosedir="$tempfile" "${@:-$(pwd)}"
+  if [ -f "$tempfile" ]; then
+    target=$(cat "$tempfile")
+    rm -f "$tempfile"
+    if [ -d "$target" ]; then
+      cd "$target"
+    fi
+  fi
+}

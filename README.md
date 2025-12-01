@@ -11,14 +11,14 @@ Join hundreds of users who enjoy **fast, organized, and elegant workspace manage
 
 </br>
 
-- **OS:** EndeavourOS  
-- **WM:** Bspwm  
-- **Bar:** Polybar  
-- **Compositor:** Picom  
-- **Terminal:** Alacritty  
-- **Shell:** Zsh  
-- **App Launcher:** Rofi  
-- **Notify Daemon:** Dunst  
+- **OS:** [**`EndeavourOS`**](https://endeavouros.com)
+- **WM:** [**`BSPWM`**](https://github.com/baskerville/bspwm) 
+- **Bar:** [**`Polybar`**](https://github.com/polybar/polybar)  
+- **Compositor:** [**`Picom`**](https://github.com/yshui/picom)  
+- **Terminal:** [**`Alacritty`**](https://github.com/alacritty/alacritty)  
+- **Shell:** [**`Zsh`**](https://github.com/zsh-users/zsh) [**`(Oh My Zsh)`**](https://github.com/ohmyzsh/ohmyzsh)
+- **App Launcher:** [**`Rofi`**](https://github.com/davatorium/rofi)  
+- **Notify Daemon:** [**`Dunst`**](https://github.com/dunst-project/dunst) 
 
 </br>
 
@@ -48,6 +48,114 @@ Join hundreds of users who enjoy **fast, organized, and elegant workspace manage
 - `sxhkd` runs automatically  
 - Polybar and scripts are pre-configured  
 - Customize colors, fonts, and scripts in `~/.Bspwm-dotfiles`  
+
+## ⌨️ Hotkeys
+
+  <details>
+  <summary>Hotkeys for Tmux</summary>
+
+  ### **Quick Access to Windows**
+  - `M-1` to `M-9`: Switch to window 1-9.
+
+  ### **Pane Navigation**
+  - `M-Left`: Move to the left pane.
+  - `M-Right`: Move to the right pane.
+  - `M-Up`: Move to the top pane.
+  - `M-Down`: Move to the bottom pane.
+
+  ### **Pane Resizing**
+  - `M-C-Left`: Resize pane to the left.
+  - `M-C-Right`: Resize pane to the right.
+  - `M-C-Up`: Resize pane upwards.
+  - `M-C-Down`: Resize pane downwards.
+
+  ### **Window and Pane Management**
+  - `M-h`: Split window vertically.
+  - `M-v`: Split window horizontally.
+  - `M-Enter`: Create a new window.
+  - `M-c`: Close the current pane.
+  - `M-q`: Close the current window.
+  - `M-d`: Detach from the tmux session.
+  - `M-C-q`: Confirm to kill the entire session.
+
+  ### **Reload Configuration**
+  - `M-r`: Reload tmux configuration.
+  - `M-s`: Choose a tmux session tree.
+
+  ### **Copying and Searching**
+  - `M-/`: Start copy mode and search forward.
+  - `M-?`: Start copy mode and search backward.
+  - `v`: Begin selection in copy mode.
+  - `y`: Copy selected text to clipboard.
+</details>
+
+<details>
+  <summary>Hotkeys for Sxhkd</summary>
+
+  ### **Reload Sxhkd Configuration**
+  - `super + Escape + r`: Reload sxhkd configuration.
+
+  ### **Launch Terminal and Applications**
+  - `super + Return`: Open Alacritty terminal.
+  - `super + d`: Open Rofi application menu.
+  - `super + x`: Launch powermenu.
+
+  ### **Volume and Brightness Control**
+  - `XF86AudioRaiseVolume`: Increase volume.
+  - `XF86AudioLowerVolume`: Decrease volume.
+  - `XF86AudioMute`: Mute/unmute sound.
+  - `XF86MonBrightnessUp`: Increase brightness.
+  - `XF86MonBrightnessDown`: Decrease brightness.
+
+  ### **Polybar and Wallpaper Management**
+  - `super + p`: Toggle Polybar visibility.
+  - `super + w`: Set a random wallpaper.
+  - `Alt_L + Shift`: Change system language.
+
+  ### **Application Hotkeys**
+  - `super + shift + {f,n,p,i,l}`: Launch applications (Firefox, Thunar, etc.).
+</details>
+
+<details>
+  <summary>Hotkeys for BSPWM</summary>
+
+  ### **Window Management**
+  - `super + space`: Toggle between tiling and floating window modes.
+  - `super + {1-9}`: Move window to desktop 1-9.
+  - `super + c`: Close the current window.
+
+  ### **Focus and Navigation**
+  - `alt + {_,shift + }Tab`: Switch to the next/previous window.
+  - `super + {grave,Tab}`: Focus on the last active window.
+
+  ### **Resizing and Moving**
+  - `super + control {h,j,k,l}`: Resize window in the specified direction.
+  - `super + {_,alt + }{h,j,k,l}`: Move window to one of the screen's sides.
+</details>
+
+<details>
+  <summary>Hotkeys for Ranger</summary>
+
+  ### **Navigation**
+  - `<Up>, <Down>, <Left>, <Right>`: Navigate directories and files.
+  - `<PageUp>, <PageDown>`: Scroll up/down through the file list.
+  - `gg`: Go to the top of the list.
+  - `G`: Go to the bottom of the list.
+
+  ### **File Operations**
+  - `yy`: Copy selected file.
+  - `dd`: Cut selected file.
+  - `pp`: Paste file.
+  - `rr`: Rename selected file.
+
+  ### **Search**
+  - `/`: Start search.
+  - `n`: Next search result.
+  - `N`: Previous search result.
+
+  ### **Image Preview**
+  - `ueberzug` is used to preview images in Ranger.
+</details>
 
 ## 🛠️ Installer
 
