@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 
+# === Настройка интерфейсов ===
+wifi_iface="wlan0"
+eth_iface="enp1s0f1"  # замените на ваш Ethernet интерфейс
+
 # === Запуск NetworkManager через pkexec, если не активен ===
 if ! systemctl is-active --quiet NetworkManager; then
     pkexec systemctl start NetworkManager
 fi
 
-# === Интерфейс Wi-Fi ===
-wifi_iface="wlan0"  # обновлено на wlan0
-
-# === Сохранённые Wi-Fi подключения (только 802-11-wireless) ===
+# === Сохранённые Wi-Fi подключения ===
 saved_connections=$(nmcli -t -f NAME,TYPE connection show | grep '802-11-wireless' | cut -d: -f1)
 
-# === Доступные сети Wi-Fi через интерфейс ===
-available_networks=$(nmcli --fields "SECURITY,SSID" device wifi list ifname $wifi_iface | sed 1d \
+# === Доступные сети Wi-Fi ===
+available_networks=$(nmcli --fields "SECURITY,SSID" device wifi list ifname "$wifi_iface" | sed 1d \
     | sed 's/  */ /g' \
     | sed -E "s/WPA*.?\S/ /g" \
     | sed "s/^--/ /g" \
@@ -21,10 +22,10 @@ available_networks=$(nmcli --fields "SECURITY,SSID" device wifi list ifname $wif
     | sed '/^$/d' \
     | sed 's/^[ \t]*//;s/[ \t]*$//')
 
-# === Формируем список для rofi: сначала сохранённые сети со значком  ===
+# === Формируем список для rofi ===
 wifi_list=""
 while read -r ssid; do
-    wifi_list+="   $ssid"$'\n'
+    wifi_list+="  $ssid"$'\n'
 done <<< "$saved_connections"
 
 while read -r net; do
@@ -34,45 +35,52 @@ while read -r net; do
     fi
 done <<< "$available_networks"
 
-# === Текущая сеть ===
-current_ssid=$(nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d':' -f2)
-
-# === Формируем массив опций для rofi ===
+# === Преобразуем в массив ===
 options=()
 while IFS= read -r net; do
     [ -n "$net" ] && options+=("$net")
 done <<< "$wifi_list"
 
-# Добавляем кнопку Disconnect в начало списка
+# === Получаем активное подключение Wi-Fi для кнопки Disconnect ===
+current_ssid=$(nmcli -t -f NAME,DEVICE connection show --active | grep ":$wifi_iface$" | cut -d: -f1)
+
 if [ -n "$current_ssid" ]; then
-    options=("   Disconnect ($current_ssid)" "${options[@]}")
+    options=("  Disconnect" "${options[@]}")
+fi
+
+# === Проверяем состояние Ethernet ===
+eth_state=$(nmcli -t -f DEVICE,STATE dev | grep "^$eth_iface:" | cut -d: -f2)
+if [ "$eth_state" = "connected" ]; then
+    eth_icon="󰈁"
 else
-    options=("   Disconnect" "${options[@]}")
+    eth_icon="󰈂"
 fi
 
 # === Запуск rofi ===
-chosen_network=$(printf '%s\n' "${options[@]}" | rofi -dmenu -i -selected-row 0 -p "Wi-Fi SSID:")
-chosen_id=$(echo "$chosen_network" | sed 's/^[ ]*//' | xargs)  # убираем лишние символы и пробелы
-
-# === Если ничего не выбрано ===
+chosen_network=$(printf '%s\n' "${options[@]}" | rofi -dmenu -i -selected-row 0 -lines 10 -width 30 -p "($eth_icon) Wi-Fi SSID:")
 [ -z "$chosen_network" ] && exit 0
+chosen_id=$(echo "$chosen_network" | sed 's/^[ ]*//' | xargs)
 
-# === Если выбрали Disconnect ===
+# === Обработка выбора Disconnect ===
 if [[ "$chosen_network" =~ "Disconnect" ]]; then
-    nmcli device disconnect $wifi_iface
+    nmcli device disconnect "$wifi_iface"
     notify-send "Wi-Fi disconnected"
     exit 0
 fi
 
 # === Подключение к сети ===
 success_message="You are now connected to \"$chosen_id\"."
-nmcli device set $wifi_iface managed yes
+nmcli device set "$wifi_iface" managed yes
 
 if echo "$saved_connections" | grep -wq "$chosen_id"; then
     nmcli connection up id "$chosen_id" && notify-send "Connected" "$success_message"
 elif [[ "$chosen_network" =~ "" ]]; then
     wifi_password=$(rofi -dmenu -p "Password: ")
-    nmcli device wifi connect "$chosen_id" password "$wifi_password" && notify-send "Connected" "$success_message"
+    if [ -n "$wifi_password" ]; then
+        nmcli device wifi connect "$chosen_id" password "$wifi_password" && notify-send "Connected" "$success_message"
+    else
+        notify-send "No password entered"
+    fi
 else
     nmcli device wifi connect "$chosen_id" && notify-send "Connected" "$success_message"
 fi
