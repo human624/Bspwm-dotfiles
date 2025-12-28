@@ -45,7 +45,7 @@ done <<< "$wifi_list"
 current_ssid=$(nmcli -t -f NAME,DEVICE connection show --active | grep ":$wifi_iface$" | cut -d: -f1)
 
 if [ -n "$current_ssid" ]; then
-    options=("  Disconnect" "${options[@]}")
+    options=("  Disconnect ($current_ssid)" "${options[@]}")
 fi
 
 # === Проверяем состояние Ethernet ===
