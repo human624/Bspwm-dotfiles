@@ -67,6 +67,9 @@ gzip
 tar
 dbus
 mesa
+lib32-mesa
+xf86-video-intel
+vulkan-intel
 pipewire-pulse
 udisks2
 polkit
