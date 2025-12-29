@@ -31,6 +31,7 @@ xclip
 rsync
 bluez
 bluez-utils
+blueman
 fakeroot
 sudo
 wget
@@ -85,3 +86,4 @@ gpick
 imagemagick
 yay
 paru
+firewalld
