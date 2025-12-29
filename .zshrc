@@ -1,5 +1,4 @@
-# Source tmux
-source ~/.local/Bspwm/bin/zsh/tmux
+#source ~/.local/Bspwm/bin/zsh/tmux
 
 # Powerlevel10k instant prompt
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
