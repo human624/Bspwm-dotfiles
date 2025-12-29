@@ -3,7 +3,7 @@
 pgrep -x sxhkd > /dev/null || sxhkd &
 
 # Создаём рабочие столы на основном мониторе
-bspc monitor -d 1 2 3 4
+bspc monitor -d 1 2 3 4 5
 
 # Window borders (Auto-Generate)
 bspc config focus_follows_pointer true
@@ -48,6 +48,9 @@ pkill battery-alert; ~/.local/Bspwm/bin/battery-alert &
 
 # start compositor
 picom --config $HOME/.config/bspwm/picom_configurations/1.conf &
+
+# Launch Polkit agent for GUI authentication
+/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 
 # run cursor tracker
 pkill cursor_tracker ; ~/.local/Bspwm/bin/cursor_tracker.sh
