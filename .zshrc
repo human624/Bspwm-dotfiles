@@ -23,7 +23,7 @@ alias la="eza -a --tree --level=1 --icons=always --no-time --no-user --no-permis
 alias n="nano"
 alias v="nvim"
 alias c="clear"
-alias ranger="ranger-cd"
+alias rn="ranger-cd"
 
 # Ctrl+Backspace delete left word
 bindkey '^H' backward-kill-word
