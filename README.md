@@ -42,13 +42,6 @@ Join hundreds of users who enjoy **fast, organized, and elegant workspace manage
 
 > ⚠️ **Note:** This configuration was primarily created and tested for a screen resolution of **1366×768**. Adjustments may be needed for other resolutions.
 
-## ▶️ Usage
-
-- Start bspwm via your display manager or `startx`  
-- `sxhkd` runs automatically  
-- Polybar and scripts are pre-configured  
-- Customize colors, fonts, and scripts in `~/.Bspwm-dotfiles`  
-
 ## ⌨️ Hotkeys
 
   <details>
@@ -173,8 +166,3 @@ This provides a **fast, seamless, and hassle-free installation experience**, all
 ## 🙏 Acknowledgements
 
 Special thanks to **[ZProger](https://www.youtube.com/@ZProger)** for inspiration and many configuration ideas used in this setup.
-
-## 🤝 Contributing
-
-Feel free to **fork** and submit pull requests.  
-Keep commits organized and clean.  
