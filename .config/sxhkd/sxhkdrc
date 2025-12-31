@@ -33,12 +33,13 @@ super + x
     {sh $HOME/.local/Bspwm/bin/powermenu}
 
 # Запуск приложений
-super + shift + {f,n,p,i,l}
+super + shift + {f,n,p,i,l,x}
 	{firefox, \
 	thunar, \
 	pavucontrol, \
 	firefox --private-window, \
-	sh $HOME/.local/Bspwm/bin/screen-lock}
+	sh $HOME/.local/Bspwm/bin/screen-lock, \
+	sh $HOME/.local/Bspwm/bin/xcolor-pick}
      
 # Изменение громкости через fn    
 XF86AudioRaiseVolume
