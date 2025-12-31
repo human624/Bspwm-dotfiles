@@ -34,7 +34,7 @@ volume_up() {
     pamixer -i 5 --unmute
     VOL=$(get_volume)
     ICON=$(get_volume_icon)
-    notify-send -u low -r 9999 -t 800 -i "$ICON" "Volume" "$VOL%"
+    notify-send -u low -r 9999 -t 800 -i "$ICON" "Volume:" "$VOL%"
 }
 
 # Уменьшение громкости
@@ -42,7 +42,7 @@ volume_down() {
     pamixer -d 5 --unmute
     VOL=$(get_volume)
     ICON=$(get_volume_icon)
-    notify-send -u low -r 9999 -t 800 -i "$ICON" "Volume" "$VOL%"
+    notify-send -u low -r 9999 -t 800 -i "$ICON" "Volume:" "$VOL%"
 }
 
 # Переключение mute
@@ -54,7 +54,7 @@ toggle_mute() {
     else
         VOL=$(get_volume)
         ICON=$(get_volume_icon)
-        notify-send -u low -r 9999 -t 800 -i "$ICON" "Volume" "$VOL%"
+        notify-send -u low -r 9999 -t 800 -i "$ICON" "Volume:" "$VOL%"
     fi
 }
 
@@ -65,7 +65,7 @@ brightness_up() {
     MAX=$(brightnessctl m)
     # вычисляем процент с округлением вниз
     PERC=$(( (BR*100 + MAX/2) / MAX ))
-    notify-send -u low -r 9999 -t 800 "brightness" "$PERC%"
+    notify-send -u low -r 9999 -t 800 "Brightness:" "$PERC%"
 }
 
 brightness_down() {
@@ -73,7 +73,7 @@ brightness_down() {
     BR=$(brightnessctl g)
     MAX=$(brightnessctl m)
     PERC=$(( (BR*100 + MAX/2) / MAX ))
-    notify-send -u low -r 9999 -t 800 "brightness" "$PERC%"
+    notify-send -u low -r 9999 -t 800 "Brightness:" "$PERC%"
 }
 
 # -----------------------
