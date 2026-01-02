@@ -6,7 +6,7 @@ fg=c0caf5
 wrong=db4b4b
 verify=7aa2f7
 
-lock_image="$HOME/Images/lock_screen.png"
+lock_image="$HOME/Images/screen-lock.png"
 
 # Используем magick вместо convert для ImageMagick 7
 magick $lock_image -resize 1366x768^ -gravity center -extent 1366x768 $lock_image
