@@ -84,6 +84,4 @@ engrampa
 parole
 gpick
 imagemagick
-yay
-paru
 firewalld
