@@ -105,9 +105,12 @@ def create_home_dirs():
         print(f"Created: {path}")
 
 def move_dotfiles():
+    exclude_dirs = ["Demonstration", "FireFox_config", "Installer"]  # Папки, которые не должны перемещаться
+    
     for item in os.scandir(DOTFILES_DIR):
-        # Пропускаем папку "Installer"
-        if item.is_dir() and item.name == "Installer":
+        # Пропускаем папки, которые нужно исключить
+        if item.is_dir() and item.name in exclude_dirs:
+            print(f"Skipping directory: {item.name}")
             continue
 
         # Перемещаем скрытые и обычные файлы
@@ -145,6 +148,41 @@ def home_menu():
             print("Invalid choice")
 
 # ======================
+# SYSTEM SERVICES
+# ======================
+
+def enable_services():
+    print("Enabling NetworkManager and firewalld services...")
+
+    # Enable NetworkManager service
+    run_cmd("sudo systemctl enable NetworkManager")
+    run_cmd("sudo systemctl start NetworkManager")
+    print("NetworkManager enabled and started.")
+
+    # Enable firewalld service
+    run_cmd("sudo systemctl enable firewalld")
+    run_cmd("sudo systemctl start firewalld")
+    print("firewalld enabled and started.")
+
+def services_menu():
+    while True:
+        print("""
+[ System Services Setup ]
+
+1) Enable NetworkManager and firewalld
+2) Go back
+""")
+        choice = input("Choice: ")
+
+        if choice == "1":
+            enable_services()
+            pause()
+        elif choice == "2":
+            break
+        else:
+            print("Invalid choice")
+
+# ======================
 # MAIN MENU
 # ======================
 
@@ -155,7 +193,8 @@ def main_menu():
 
 1) Install dependencies
 2) Setup Home directories
-3) Exit
+3) Enable system services (NetworkManager, firewalld)
+4) Exit
 """)
         choice = input("Choice: ")
 
@@ -164,6 +203,8 @@ def main_menu():
         elif choice == "2":
             home_menu()
         elif choice == "3":
+            services_menu()
+        elif choice == "4":
             print("Exiting...")
             sys.exit(0)
         else:
