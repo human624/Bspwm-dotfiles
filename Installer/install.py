@@ -105,7 +105,7 @@ def create_home_dirs():
         print(f"Created: {path}")
 
 def move_dotfiles():
-    exclude_dirs = ["Demonstration", "FireFox_config", "Installer"]  # Папки, которые не должны перемещаться
+    exclude_dirs = ["Demonstration", "FireFox_config", "Installer", "LightDM"]  # Папки, которые не должны перемещаться
     
     for item in os.scandir(DOTFILES_DIR):
         # Пропускаем папки, которые нужно исключить
@@ -113,7 +113,41 @@ def move_dotfiles():
             print(f"Skipping directory: {item.name}")
             continue
 
-        # Перемещаем скрытые и обычные файлы
+        # Если это папка LightDM в .config, перемещаем её файлы в /etc/lightdm/
+        if item.is_dir() and item.name == "config":
+            lightdm_dir = os.path.join(HOME, ".config", "LightDM")
+            if os.path.isdir(lightdm_dir):
+                lightdm_target_dir = "/etc/lightdm/"
+                
+                if not os.path.exists(lightdm_target_dir):
+                    print(f"Creating directory: {lightdm_target_dir}")
+                    os.makedirs(lightdm_target_dir, exist_ok=True)
+                
+                # Удаляем файл lightdm.conf, если он существует
+                lightdm_conf = os.path.join(lightdm_target_dir, "lightdm.conf")
+                if os.path.exists(lightdm_conf):
+                    print(f"Removing existing {lightdm_conf}")
+                    os.remove(lightdm_conf)
+
+                # Перемещаем все файлы и папки из .config/LightDM в /etc/lightdm/
+                for lightdm_item in os.scandir(lightdm_dir):
+                    lightdm_src = lightdm_item.path
+                    lightdm_dst = os.path.join(lightdm_target_dir, lightdm_item.name)
+
+                    if os.path.exists(lightdm_dst):
+                        print(f"Already exists, skipping: {lightdm_item.name}")
+                        continue
+
+                    shutil.move(lightdm_src, lightdm_dst)
+                    print(f"Moved {lightdm_item.name} to {lightdm_target_dir}")
+                continue
+
+        # Пропускаем скрытые файлы
+        if item.name.startswith('.'):
+            print(f"Skipping hidden file: {item.name}")
+            continue
+
+        # Перемещаем обычные файлы
         src = item.path
         dst = os.path.join(HOME, item.name)
 
