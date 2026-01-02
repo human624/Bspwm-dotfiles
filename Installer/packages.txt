@@ -85,3 +85,4 @@ parole
 gpick
 imagemagick
 firewalld
+ristretto
