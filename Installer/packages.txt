@@ -3,6 +3,7 @@ sxhkd
 xorg-server
 xorg-xinit
 xorg-xset
+xorg-xinput
 picom
 feh
 alacritty
@@ -87,3 +88,4 @@ gpick
 imagemagick
 firewalld
 ristretto
+libinput
