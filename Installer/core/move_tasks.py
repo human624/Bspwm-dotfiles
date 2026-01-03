@@ -11,7 +11,7 @@ def create_directories():
     clear()
     header("CREATE DIRECTORIES")
 
-    for d in ["Downloads", "Documents", "Pictures", "Videos", "Music", "Desktop"]:
+    for d in ["Downloads", "Documents", "Images", "Videos", "Music", "Desktop"]:
         os.makedirs(os.path.join(HOME, d), exist_ok=True)
         log_dir(f"~/{d}")
 
