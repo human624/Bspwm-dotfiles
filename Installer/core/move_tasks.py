@@ -57,7 +57,7 @@ def install_lightdm():
     dst = "/etc/lightdm"
 
     if not os.path.isdir(src):
-        log_err("LightDM конфигурация не найдена")
+        log_err("LightDM configuration not found")
         return
 
     require_root()
