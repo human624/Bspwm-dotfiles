@@ -21,13 +21,24 @@ def clear():
 def pause():
     input(f"\n{GRAY}Press Enter...{RESET}")
 
-def run(cmd, cwd=None):
-    subprocess.run(cmd, shell=True, cwd=cwd)
-
 def require_root():
     if os.geteuid() != 0:
-        print(f"{MAGENTA}🔐 Root privileges required, requesting sudo...{RESET}")
-        os.execvp("sudo", ["sudo", "python3"] + sys.argv)
+        print(f"{MAGENTA} Root privileges required, requesting sudo...{RESET}")
+        
+        # Проверка доступа с sudo
+        process = subprocess.run(['sudo', 'echo', ''], capture_output=True)
+        if process.returncode != 0:
+            log_err("Failed to authenticate with sudo. Exiting.")
+            sys.exit(1)  # Завершаем программу, если не удалось получить права
+        else:
+            print(f"{GREEN}Root privileges granted.{RESET}")
+
+def run(cmd, cwd=None):
+    # Проверка на необходимость использования sudo
+    if "sudo" not in cmd and os.geteuid() != 0:
+        cmd = f"sudo {cmd}"
+    
+    subprocess.run(cmd, shell=True, cwd=cwd)
 
 # ── Logging ─────────────────────
 def log_file(p): print(f"{GREEN}[FILE]{RESET} {p}")
