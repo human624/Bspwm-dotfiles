@@ -21,7 +21,7 @@ def install_pacman_packages():
             p = p.strip()
             if p:
                 print(f"{CYAN}→{RESET} {p}")
-                run(f"sudo pacman -S --noconfirm {p}")
+                run(f"sudo pacman -S {p}")
 
 def install_ohmyzsh():
     clear()
@@ -65,4 +65,4 @@ def install_aur_packages():
             p = p.strip()
             if p:
                 print(f"{CYAN}→{RESET} {p}")
-                run(f"paru -S --noconfirm {p}")
+                run(f"paru -S {p}")
