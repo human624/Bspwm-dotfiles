@@ -2,6 +2,7 @@ bspwm
 sxhkd
 xorg-server
 xorg-xinit
+xorg-xset
 picom
 feh
 alacritty
