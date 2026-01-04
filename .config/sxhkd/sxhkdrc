@@ -60,7 +60,7 @@ XF86MonBrightnessDown
 
 # Снимок экрана
 Print
-    xfce4-screenshooter
+    flameshot gui
 
 #
 # Горячие клавиши BSPWM
