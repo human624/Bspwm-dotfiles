@@ -20,8 +20,6 @@ def move_dotfiles():
     header("MOVE DOTFILES")
 
     exclude = [".git", "Installer", "README.md", "LICENSE", "FireFox_config", "Demonstration"]
-    
-    # Новая переменная для файлов и папок внутри .config, которые не нужно копировать
     config_exclude = ["LightDM", "30-touchpad.conf"]
 
     for item in os.listdir(DOTFILES):
@@ -48,6 +46,10 @@ def move_dotfiles():
                 else:
                     shutil.copy2(cfg_path, dst_path)
                     log_file(f"~/.config/{cfg}")
+
+            # Установим права 700 для всех файлов и папок в ~/.config
+            run(f"chmod -R 700 '{dst}'")
+            log_info("Permissions 700 applied to ~/.config")
         else:
             if os.path.isdir(src):
                 shutil.copytree(src, dst, dirs_exist_ok=True)
