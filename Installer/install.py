@@ -29,6 +29,7 @@ def move_menu():
             "1": "Create directories",
             "2": "Move dotfiles",
             "3": "Install LightDM",
+            "4": "Install touchpad config",
             "0": "Back"
         }
         category_box("FILE MANAGEMENT", options)
@@ -36,6 +37,7 @@ def move_menu():
         if choice == "1": create_directories()
         elif choice == "2": move_dotfiles()
         elif choice == "3": install_lightdm()
+        elif choice == "4": move_touchpad_conf()
         elif choice == "0": return
         pause()
 
