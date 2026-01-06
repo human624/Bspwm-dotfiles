@@ -20,6 +20,9 @@ def move_dotfiles():
     header("MOVE DOTFILES")
 
     exclude = [".git", "Installer", "README.md", "LICENSE", "FireFox_config", "Demonstration"]
+    
+    # Новая переменная для файлов и папок внутри .config, которые не нужно копировать
+    config_exclude = ["LightDM", "30-touchpad.conf"]
 
     for item in os.listdir(DOTFILES):
         if item in exclude:
@@ -32,15 +35,19 @@ def move_dotfiles():
         if item == ".config":
             os.makedirs(dst, exist_ok=True)
             for cfg in os.listdir(src):
-                if cfg == "LightDM":
-                    log_skip(".config/LightDM")
+                if cfg in config_exclude:
+                    log_skip(f".config/{cfg}")
                     continue
-                shutil.copytree(
-                    os.path.join(src, cfg),
-                    os.path.join(dst, cfg),
-                    dirs_exist_ok=True
-                )
-                log_dir(f"~/.config/{cfg}")
+
+                cfg_path = os.path.join(src, cfg)
+                dst_path = os.path.join(dst, cfg)
+
+                if os.path.isdir(cfg_path):
+                    shutil.copytree(cfg_path, dst_path, dirs_exist_ok=True)
+                    log_dir(f"~/.config/{cfg}")
+                else:
+                    shutil.copy2(cfg_path, dst_path)
+                    log_file(f"~/.config/{cfg}")
         else:
             if os.path.isdir(src):
                 shutil.copytree(src, dst, dirs_exist_ok=True)
@@ -63,3 +70,23 @@ def install_lightdm():
     require_root()
     run(f"cp -rT '{src}' '{dst}'")
     log_root("/etc/lightdm")
+
+def move_touchpad_conf():
+    clear()
+    header("TOUCHPAD CONFIG")
+
+    src = os.path.join(DOTFILES, ".config", "30-touchpad.conf")
+    dst_dir = "/etc/X11/xorg.conf.d/"
+    dst = os.path.join(dst_dir, "30-touchpad.conf")
+
+    if not os.path.isfile(src):
+        log_err("30-touchpad.conf not found in .config")
+        return
+
+    require_root()
+
+    # Создаем директорию если её нет
+    os.makedirs(dst_dir, exist_ok=True)
+
+    run(f"cp '{src}' '{dst}'")
+    log_root(dst)
