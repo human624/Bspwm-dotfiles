@@ -1,0 +1,20 @@
+# Installer configuration
+directories:
+  - Downloads
+  - Documents
+  - Images
+  - Videos
+  - Music
+  - Desktop
+
+exclude_root:
+  - .git
+  - Installer
+  - README.md
+  - LICENSE
+  - FireFox_config
+  - Demonstration
+
+exclude_config:
+  - LightDM
+  - 30-touchpad.conf
