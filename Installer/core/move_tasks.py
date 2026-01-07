@@ -1,94 +1,79 @@
-import os
+from core.config import DOTFILES, HOME
+from core.utils import run, log_file, log_dir, log_skip, log_root, log_err, clear
+from core.ui import header
+from core.config_loader import load_config
+from pathlib import Path
 import shutil
 
-from core.utils import *
-from core.ui import header
+# ── Load installer config
+CONFIG_FILE = DOTFILES / "Installer" / "config.yaml"
+CONFIG = load_config(CONFIG_FILE)
 
-HOME = os.path.expanduser("~")
-DOTFILES = os.path.join(HOME, "Bspwm-dotfiles")
+DIRS = CONFIG.get("directories", ["Downloads", "Documents", "Images", "Videos", "Music", "Desktop"])
+EXCLUDE_ROOT = set(CONFIG.get("exclude_root", []))
+EXCLUDE_CONFIG = set(CONFIG.get("exclude_config", []))
 
+# ── Copy a file or directory
+def copy_item(src: Path, dst: Path):
+    if src.is_dir():
+        shutil.copytree(src, dst, dirs_exist_ok=True)
+        log_dir(dst)
+    else:
+        shutil.copy2(src, dst)
+        log_file(dst)
+
+# ── Create standard user directories
 def create_directories():
     clear()
     header("CREATE DIRECTORIES")
+    for name in DIRS:
+        p = HOME / name
+        p.mkdir(exist_ok=True)
+        log_dir(f"~/{name}")
 
-    for d in ["Downloads", "Documents", "Images", "Videos", "Music", "Desktop"]:
-        os.makedirs(os.path.join(HOME, d), exist_ok=True)
-        log_dir(f"~/{d}")
-
+# ── Move dotfiles from repository to home
 def move_dotfiles():
     clear()
     header("MOVE DOTFILES")
-
-    exclude = [".git", "Installer", "README.md", "LICENSE", "FireFox_config", "Demonstration"]
-    config_exclude = ["LightDM", "30-touchpad.conf"]
-
-    for item in os.listdir(DOTFILES):
-        if item in exclude:
-            log_skip(item)
+    for item in DOTFILES.iterdir():
+        if item.name in EXCLUDE_ROOT:
+            log_skip(item.name)
             continue
 
-        src = os.path.join(DOTFILES, item)
-        dst = os.path.join(HOME, item)
-
-        if item == ".config":
-            os.makedirs(dst, exist_ok=True)
-            for cfg in os.listdir(src):
-                if cfg in config_exclude:
-                    log_skip(f".config/{cfg}")
-                    continue
-
-                cfg_path = os.path.join(src, cfg)
-                dst_path = os.path.join(dst, cfg)
-
-                if os.path.isdir(cfg_path):
-                    shutil.copytree(cfg_path, dst_path, dirs_exist_ok=True)
-                    log_dir(f"~/.config/{cfg}")
-                else:
-                    shutil.copy2(cfg_path, dst_path)
-                    log_file(f"~/.config/{cfg}")
-
-            # Установим права 700 для всех файлов и папок в ~/.config
-            run(f"chmod -R 700 '{dst}'")
-            log_info("Permissions 700 applied to ~/.config")
+        target = HOME / item.name
+        if item.name == ".config":
+            move_config(item, target, EXCLUDE_CONFIG)
         else:
-            if os.path.isdir(src):
-                shutil.copytree(src, dst, dirs_exist_ok=True)
-                log_dir(f"~/{item}")
-            else:
-                shutil.copy2(src, dst)
-                log_file(f"~/{item}")
+            copy_item(item, target)
+
+def move_config(src: Path, dst: Path, exclude):
+    dst.mkdir(exist_ok=True)
+    for cfg in src.iterdir():
+        if cfg.name in exclude:
+            log_skip(f".config/{cfg.name}")
+            continue
+        copy_item(cfg, dst / cfg.name)
+    run(f"chmod -R 700 '{dst}'")
 
 def install_lightdm():
     clear()
     header("LIGHTDM")
-
-    src = os.path.join(DOTFILES, ".config", "LightDM")
-    dst = "/etc/lightdm"
-
-    if not os.path.isdir(src):
-        log_err("LightDM configuration not found")
+    src = DOTFILES / ".config" / "LightDM"
+    dst = Path("/etc/lightdm")
+    if not src.exists():
+        log_err("LightDM config not found")
         return
-
-    require_root()
-    run(f"cp -rT '{src}' '{dst}'")
-    log_root("/etc/lightdm")
+    run(f"cp -rT '{src}' '{dst}'", sudo=True)
+    log_root(dst)
 
 def move_touchpad_conf():
     clear()
     header("TOUCHPAD CONFIG")
-
-    src = os.path.join(DOTFILES, ".config", "30-touchpad.conf")
-    dst_dir = "/etc/X11/xorg.conf.d/"
-    dst = os.path.join(dst_dir, "30-touchpad.conf")
-
-    if not os.path.isfile(src):
-        log_err("30-touchpad.conf not found in .config")
+    src = DOTFILES / ".config" / "30-touchpad.conf"
+    dst = Path("/etc/X11/xorg.conf.d/30-touchpad.conf")
+    if not src.exists():
+        log_err("touchpad config not found")
         return
-
-    require_root()
-
-    # Создаем директорию если её нет
-    os.makedirs(dst_dir, exist_ok=True)
-
-    run(f"cp '{src}' '{dst}'")
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    run(f"cp '{src}' '{dst}'", sudo=True)
     log_root(dst)
