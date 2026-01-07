@@ -1,52 +1,29 @@
-import os
+from core import run, clear, header
+from pathlib import Path
 import shutil
 
-from core.utils import *
-from core.ui import header
+BASE_DIR = Path(__file__).resolve().parents[1]
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-HOME = os.path.expanduser("~")
+# ── Read packages from file
+def read_packages(file: Path):
+    return [p for p in file.read_text().splitlines() if p.strip()]
 
 def install_pacman_packages():
     clear()
     header("PACMAN PACKAGES")
+    for pkg in read_packages(BASE_DIR / "packages.txt"):
+        print(f"→ {pkg}")
+        run(f"pacman -S --needed {pkg}", sudo=True)
 
-    pkg = os.path.join(BASE_DIR, "packages.txt")
-    if not os.path.isfile(pkg):
-        log_err("packages.txt not found")
-        return
-
-    with open(pkg) as f:
-        for p in f:
-            p = p.strip()
-            if p:
-                print(f"{CYAN}→{RESET} {p}")
-                run(f"sudo pacman -S {p}")
-
-def install_ohmyzsh():
-    clear()
-    header("OH MY ZSH")
-
-    # Download and run Oh My Zsh installer
-    run("wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh")
-    run("sh install.sh")
-
-    zsh_custom = os.environ.get("ZSH_CUSTOM", f"{HOME}/.oh-my-zsh/custom")
-
-    # Install Powerlevel10k theme
-    run(f"git clone --depth=1 https://github.com/romkatv/powerlevel10k.git {zsh_custom}/themes/powerlevel10k")
-    
-    # Install Zsh plugins
-    run(f"git clone https://github.com/zsh-users/zsh-autosuggestions {zsh_custom}/plugins/zsh-autosuggestions")
-    run(f"git clone https://github.com/zsh-users/zsh-syntax-highlighting {zsh_custom}/plugins/zsh-syntax-highlighting")
+    # After installing packages, create symlink for Thunar terminal
+    run("ln -sf /usr/bin/alacritty /usr/bin/xterm", sudo=True)
+    print("→ Symbolic link /usr/bin/xterm → /usr/bin/alacritty created for Thunar")
 
 def install_paru():
     clear()
     header("PARU")
-
-    if os.path.isdir("paru"):
+    if Path("paru").exists():
         shutil.rmtree("paru")
-
     run("git clone https://aur.archlinux.org/paru.git")
     run("makepkg -si", cwd="paru")
     shutil.rmtree("paru")
@@ -54,15 +31,6 @@ def install_paru():
 def install_aur_packages():
     clear()
     header("AUR PACKAGES")
-
-    pkg = os.path.join(BASE_DIR, "aur_packages.txt")
-    if not os.path.isfile(pkg):
-        log_err("aur_packages.txt not found")
-        return
-
-    with open(pkg) as f:
-        for p in f:
-            p = p.strip()
-            if p:
-                print(f"{CYAN}→{RESET} {p}")
-                run(f"paru -S {p}")
+    for pkg in read_packages(BASE_DIR / "aur_packages.txt"):
+        print(f"→ {pkg}")
+        run(f"paru -S --needed {pkg}")
