@@ -1,23 +1,22 @@
-from core.utils import *
+from core.utils import RESET, BOLD, BLUE
 
-BOX_WIDTH = 40  # ширина рамки
+BOX_WIDTH = 40  # width of the box
 
 def header(title):
-    """Заголовок с аккуратной рамкой"""
+    """Print a header with a nice box."""
     print(f"{BLUE}{BOLD}")
     print("┌" + "─" * BOX_WIDTH + "┐")
-    print(f"│{title.center(BOX_WIDTH)}│")  # без лишних пробелов по краям
+    print(f"│{title.center(BOX_WIDTH)}│")
     print("└" + "─" * BOX_WIDTH + "┘")
     print(RESET)
 
 def category_box(title, options):
-    """Категория с аккуратной рамкой"""
+    """Print a category with options in a box."""
     print(f"{BLUE}{BOLD}┌" + "─" * BOX_WIDTH + "┐")
     print(f"│{title.center(BOX_WIDTH)}│")
-    print(f"├" + "─" * BOX_WIDTH + "┤")
+    print("├" + "─" * BOX_WIDTH + "┤")
     for key, desc in options.items():
         line_text = f"{key}. {desc}"
-        # Выравниваем так, чтобы правая рамка была ровной
         print(f"│{line_text:<{BOX_WIDTH}}│")
     print("└" + "─" * BOX_WIDTH + "┘")
     print(RESET)
