@@ -87,5 +87,5 @@ parole
 gpick
 imagemagick
 firewalld
-ristretto
 libinput
+viewnior
