@@ -1,20 +1,29 @@
 #!/usr/bin/env bash
+# XColor Picker (Simple Improved)
 
-TEMP_DIR=/tmp/xcolor
-MSG=${XDG_CACHE_HOME:-$HOME/.cache}/xcolor.msg
+# Config
+TEMP_DIR="/tmp/xcolor"   # preview folder
+EXPIRE_TIME=5000         # notification time (ms)
+PREVIEW_SIZE=120         # eyedropper circle size
+SCALE=6                  # zoom scale
+IMAGE_SIZE="100x100"     # preview size
 
-EXPIRE_TIME=5000
+mkdir -p "$TEMP_DIR"
 
-main() {
-    HEX_COLOR=$(gpick -pso --no-newline)
-    mkdir -p $TEMP_DIR
-    HEX="${HEX_COLOR#\#}"
-    FNAME="$TEMP_DIR/$HEX.png"
-    convert -size 100x100 xc:"$HEX_COLOR" "$FNAME"
-    COLOR_CODE="$HEX_COLOR"
+# Pick color
+xcolor -f HEX -s clipboard -P "$PREVIEW_SIZE" -S "$SCALE"
+HEX_COLOR=$(xclip -o -selection clipboard | tr -d '\n\r ')
 
-    printf %s "$COLOR_CODE" | xclip -sel c
-        notify-send -a XColor --icon="$FNAME" HEX: "$COLOR_CODE" --expire-time="$EXPIRE_TIME"
-}
+# Check selection
+if [ -z "$HEX_COLOR" ]; then
+    notify-send -a XColor "No color selected" --expire-time="$EXPIRE_TIME"
+    exit 1
+fi
 
-main
+# Create temporary preview image
+HEX="${HEX_COLOR#\#}"
+FNAME="$TEMP_DIR/$HEX.png"
+magick -size "$IMAGE_SIZE" xc:"$HEX_COLOR" "$FNAME"
+
+# Show notification
+notify-send -a XColor --icon="$FNAME" "HEX:" "$HEX_COLOR" --expire-time="$EXPIRE_TIME"
