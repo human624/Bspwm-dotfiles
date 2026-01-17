@@ -90,3 +90,4 @@ imagemagick
 firewalld
 libinput
 viewnior
+xcolor
