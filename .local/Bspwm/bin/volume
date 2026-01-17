@@ -1,89 +1,55 @@
-#!/bin/bash
-# Скрипт управления Fn-клавишами: громкость, mute, яркость
-# Работает с pamixer и brightnessctl
-# Author: ZDvDZ
+#!/usr/bin/env bash
 
-# -----------------------
-# Функции
-# -----------------------
+NOTIFY_ID=9999
 
-# Получаем текущую громкость
-get_volume() {
-    pamixer --get-volume
+notify() {
+    notify-send -u low -r "$NOTIFY_ID" -t 600 "$1" "$2"
 }
 
-# Получаем иконку в зависимости от громкости
-get_volume_icon() {
-    vol=$(get_volume)
-    ICON_DIR="/usr/share/icons/Papirus-Dark/24x24/status"
-    if [ "$vol" -eq 0 ]; then
-        echo "$ICON_DIR/audio-volume-muted.png"
-    elif [ "$vol" -le 30 ]; then
-        echo "$ICON_DIR/audio-volume-low.png"
-    elif [ "$vol" -le 60 ]; then
-        echo "$ICON_DIR/audio-volume-medium.png"
-    elif [ "$vol" -le 90 ]; then
-        echo "$ICON_DIR/audio-volume-high.png"
-    else
-        echo "$ICON_DIR/audio-volume-overamplified.png"
-    fi
-}
-
-# Увеличение громкости
+# Volume controls
 volume_up() {
     pamixer -i 5 --unmute
-    VOL=$(get_volume)
-    ICON=$(get_volume_icon)
-    notify-send -u low -r 9999 -t 800 -i "$ICON" "Volume:" "$VOL%"
+    notify "Volume" "$(pamixer --get-volume)%"
 }
 
-# Уменьшение громкости
 volume_down() {
     pamixer -d 5 --unmute
-    VOL=$(get_volume)
-    ICON=$(get_volume_icon)
-    notify-send -u low -r 9999 -t 800 -i "$ICON" "Volume:" "$VOL%"
+    notify "Volume" "$(pamixer --get-volume)%"
 }
 
-# Переключение mute
 toggle_mute() {
     pamixer -t
-    if [ "$(pamixer --get-mute)" == "true" ]; then
-        ICON="/usr/share/icons/Papirus-Dark/24x24/status/audio-volume-muted.png"
-        notify-send -u low -r 9999 -t 800 -i "$ICON" "Mute"
+    if pamixer --get-mute | grep -q true; then
+        notify "Volume" "Muted"
     else
-        VOL=$(get_volume)
-        ICON=$(get_volume_icon)
-        notify-send -u low -r 9999 -t 800 -i "$ICON" "Volume:" "$VOL%"
+        notify "Volume" "$(pamixer --get-volume)%"
     fi
 }
 
-# Увеличение яркости
+# Brightness controls
+brightness_percent() {
+    brightnessctl i | grep -o '(.*%)' | tr -d '()%'
+}
+
 brightness_up() {
-    brightnessctl s +5%
-    BR=$(brightnessctl g)
-    MAX=$(brightnessctl m)
-    # вычисляем процент с округлением вниз
-    PERC=$(( (BR*100 + MAX/2) / MAX ))
-    notify-send -u low -r 9999 -t 800 "Brightness:" "$PERC%"
+    brightnessctl s +5% > /dev/null
+    notify "Brightness" "$(brightness_percent)%"
 }
 
 brightness_down() {
-    brightnessctl s 5%-
-    BR=$(brightnessctl g)
-    MAX=$(brightnessctl m)
-    PERC=$(( (BR*100 + MAX/2) / MAX ))
-    notify-send -u low -r 9999 -t 800 "Brightness:" "$PERC%"
+    brightnessctl s 5%- > /dev/null
+    notify "Brightness" "$(brightness_percent)%"
 }
 
-# -----------------------
-# Выполнение по аргументу
-# -----------------------
-case "$1" in
-    volume-up) volume_up ;;
-    volume-down) volume_down ;;
-    toggle-mute) toggle_mute ;;
-    brightness-up) brightness_up ;;
-    brightness-down) brightness_down ;;
-    *) echo "Use: $0 {volume-up|volume-down|toggle-mute|brightness-up|brightness-down}" ;;
+# Dispatcher
+case "${1:-}" in
+    volume-up)         volume_up ;;
+    volume-down)       volume_down ;;
+    toggle-mute)       toggle_mute ;;
+    brightness-up)     brightness_up ;;
+    brightness-down)   brightness_down ;;
+    *)
+        echo "Usage: $0 {volume-up|volume-down|toggle-mute|brightness-up|brightness-down}"
+        exit 1
+        ;;
 esac
