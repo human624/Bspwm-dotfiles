@@ -124,8 +124,8 @@ super + ctrl + shift + space
 #
 
 # Расширение окна
-super + control {h,j,k,l}
-    bspc node -z {left -20 0,right 20 0,top 0 -20,bottom 0 20} 
+super + ctrl + {h,j,k,l}
+    bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
 
 # Отправить окно на другой край экрана
 super + {_,alt + }{h,j,k,l}
