@@ -11,8 +11,8 @@ Join hundreds of users who enjoy **fast, organized, and elegant workspace manage
 
 </br>
 
-- **OS:** [**`EndeavourOS`**](https://endeavouros.com)
-- **WM:** [**`BSPWM`**](https://github.com/baskerville/bspwm) 
+- **OS:** [**`Arch`**](https://archlinux.org)
+- **WM:** [**`Bspwm`**](https://github.com/baskerville/bspwm) 
 - **Bar:** [**`Polybar`**](https://github.com/polybar/polybar)  
 - **Compositor:** [**`Picom`**](https://github.com/yshui/picom)  
 - **Terminal:** [**`Alacritty`**](https://github.com/alacritty/alacritty)  
@@ -80,88 +80,167 @@ Join hundreds of users who enjoy **fast, organized, and elegant workspace manage
   - `M-?`: Start copy mode and search backward.
   - `v`: Begin selection in copy mode.
   - `y`: Copy selected text to clipboard.
+
 </details>
 
 <details>
-  <summary>Hotkeys for Sxhkd</summary>
+<summary>Hotkeys for Bspwm</summary>
 
-  ### **Reload Sxhkd Configuration**
-  - `super + Escape + r`: Reload sxhkd configuration.
+### **System & Daemon Control**
+- `Super + Escape + r` — Reload sxhkd configuration
+- `Ctrl + Shift + q` — Quit BSPWM
+- `Ctrl + Shift + r` — Reload BSPWM
 
-  ### **Launch Terminal and Applications**
-  - `super + Return`: Open Alacritty terminal.
-  - `super + d`: Open Rofi application menu.
-  - `super + x`: Launch powermenu.
 
-  ### **Volume and Brightness Control**
-  - `XF86AudioRaiseVolume`: Increase volume.
-  - `XF86AudioLowerVolume`: Decrease volume.
-  - `XF86AudioMute`: Mute/unmute sound.
-  - `XF86MonBrightnessUp`: Increase brightness.
-  - `XF86MonBrightnessDown`: Decrease brightness.
+### **Launchers & Utilities**
+- `Super + Return` — Open terminal (Alacritty)
+- `Super + d` — Rofi (drun)
+- `Super + x` — Power menu
+- `Super + p` — Toggle Polybar
+- `Super + w` — Random wallpaper
+- `Print` — Screenshot (Flameshot)
+- `Alt + Shift` — Change keyboard layout
 
-  ### **Polybar and Wallpaper Management**
-  - `super + p`: Toggle Polybar visibility.
-  - `super + w`: Set a random wallpaper.
-  - `Alt_L + Shift`: Change system language.
+### **Application Shortcuts**
+- `Super + Shift + f` — Firefox
+- `Super + Shift + n` — Thunar
+- `Super + Shift + p` — Pavucontrol
+- `Super + Shift + i` — Firefox (private)
+- `Super + Shift + l` — Lock screen
+- `Super + Shift + x` — Color picker
 
-  ### **Application Hotkeys**
-  - `super + shift + {f,n,p,i,l}`: Launch applications (Firefox, Thunar, etc.).
+### **Volume & Brightness**
+- `XF86AudioRaiseVolume` — Volume up
+- `XF86AudioLowerVolume` — Volume down
+- `XF86AudioMute` — Toggle mute
+- `XF86MonBrightnessUp` — Brightness up
+- `XF86MonBrightnessDown` — Brightness down
+
+### **Window State & Layout**
+- `Super + Space` — Toggle tiled / floating
+- `Super + t` — Tiled mode
+- `Super + Ctrl + t` — Pseudo-tiled mode
+- `Super + f` — Fullscreen
+- `Super + c` — Close window
+
+### **Focus & Navigation**
+- `Alt + Tab` — Focus next window
+- `Alt + Shift + Tab` — Focus previous window
+- `Super + Tab` — Focus last window
+- `Super + Grave` — Focus last node / desktop
+
+### **Desktops & Window Movement**
+- `Super + {1–9}` — Focus desktop
+- `Super + Shift + {1–9}` — Move window to desktop
+
+### **Preselection**
+- `Super + Ctrl + {1–9}` — Set split ratio
+- `Super + Ctrl + Space` — Cancel preselection (node)
+- `Super + Ctrl + Shift + Space` — Cancel preselection (desktop)
+
+### **Resize & Move**
+- `Super + Ctrl + h/j/k/l` — Resize window
+- `Super + h/j/k/l` — Move window
+- `Super + Alt + h/j/k/l` — Swap window
+
+### **Window Flags**
+- `Super + Ctrl + m` — Mark window
+- `Super + Ctrl + x` — Lock window
+- `Super + Ctrl + y` — Sticky window
+- `Super + Ctrl + z` — Private window
+
+### **Advanced**
+- `Super + g` — Swap with biggest window
+
 </details>
 
 <details>
-  <summary>Hotkeys for BSPWM</summary>
+<summary>Hotkeys for Ranger</summary>
 
-  ### **Window Management**
-  - `super + space`: Toggle between tiling and floating window modes.
-  - `super + {1-9}`: Move window to desktop 1-9.
-  - `super + c`: Close the current window.
+### Basic
+- `q` — Quit
+- `Q` — Quit All
+- `R` — Reload Current Directory
+- `:` / `;` — Open Console
+- `i` — Display File
+- `Alt + j / Alt + k` — Scroll Preview
+- `<Space>` — Toggle Mark
+- `v` — Mark All
+- `uv` — Unmark All
+- `V / uV` — Toggle Visual Mode
 
-  ### **Focus and Navigation**
-  - `alt + {_,shift + }Tab`: Switch to the next/previous window.
-  - `super + {grave,Tab}`: Focus on the last active window.
+### Navigation
+- `gh` — Go Home
+- `ge` — Go to /etc
+- `gu` — Go to /usr
+- `gd` — Go to /dev
+- `gl` — Go to Previous Directory
+- `gM` — Go to /mnt
+- `gr` — Go to Root
 
-  ### **Resizing and Moving**
-  - `super + control {h,j,k,l}`: Resize window in the specified direction.
-  - `super + {_,alt + }{h,j,k,l}`: Move window to one of the screen's sides.
-</details>
+### File Operations
+- `yy` — Copy
+- `dd` — Cut
+- `pp` — Paste
+- `dD` — Delete
+- `dT` — Trash
+- `cw` — Rename
+- `a` — Rename Append
 
-<details>
-  <summary>Hotkeys for Ranger</summary>
+### Tabs & Sorting
+- `Ctrl + n` — New Tab
+- `Ctrl + w` — Close Tab
+- `Tab / Shift + Tab` — Move Tab
+- `gt / gT` — Next / Previous Tab
+- `os` — Sort by Size
+- `ob` — Sort by Name
+- `on` — Natural Sort
+- `or` — Toggle Reverse Sort
 
-  ### **Navigation**
-  - `<Up>, <Down>, <Left>, <Right>`: Navigate directories and files.
-  - `<PageUp>, <PageDown>`: Scroll up/down through the file list.
-  - `gg`: Go to the top of the list.
-  - `G`: Go to the bottom of the list.
+### Preview & Display
+- `zp` — Preview Files
+- `zP` — Preview Directories
+- `zc` — Collapse Preview
+- `zh / Ctrl + h` — Toggle Hidden Files
+- `zi` — Toggle Preview Images
+- `zv` — Toggle Use Preview Script
+- `zm` — Toggle Mouse
 
-  ### **File Operations**
-  - `yy`: Copy selected file.
-  - `dd`: Cut selected file.
-  - `pp`: Paste file.
-  - `rr`: Rename selected file.
+### Search & Filter
+- `/` — Search
+- `n` — Next Search
+- `N` — Previous Search
+- `zf` — Filter Console
 
-  ### **Search**
-  - `/`: Start search.
-  - `n`: Next search result.
-  - `N`: Previous search result.
-
-  ### **Image Preview**
-  - `ueberzug` is used to preview images in Ranger.
 </details>
 
 ## 🛠️ Installer
 
-To make the setup process as smooth and effortless as possible, a dedicated **Installer** folder has been added.  
-Inside, you'll find a **fully automated installation script** that handles all required dependencies for the complete Bspwm-dotfiles environment — from the window manager itself to essential tools, utilities, and supporting components.
+This **Installer** is designed for a smooth setup of Bspwm-dotfiles.  
+Here, you can **choose which options to install**, instead of manually searching for and installing packages.
 
-All you need to do is open the **Installer** folder and run the following command:
+### Installation Steps
+
+**1. Install required dependencies via pacman:**
+```sh
+sudo pacman -Syu python git
+```
+**2. Clone the repository:**
+```sh
+git clone https://github.com/human624/Bspwm-dotfiles.git
+```
+**3. Navigate to the Installer folder:**
+```sh
+cd Bspwm-dotfiles/Installer
+```
+**4. Run the installer script:**
 ```sh
 python3 install.py
 ```
-The script will automatically install everything you need within minutes, saving you from manually searching for, tracking, and installing each package one by one.
+> ⚡ Once the script starts, you can select the categories and options you want to install.
+This gives you full control over which parts of the Bspwm-dotfiles environment are installed on your system.
 
-This provides a **fast, seamless, and hassle-free installation experience**, allowing you to dive straight into customizing and enjoying your optimized desktop environment.
+This approach ensures a flexible, interactive, and user-friendly installation, letting you configure your desktop environment exactly the way you want.
 
 ## 🙏 Acknowledgements
 
