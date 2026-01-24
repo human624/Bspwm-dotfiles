@@ -1,24 +1,63 @@
 #!/bin/bash
 
+# i3lock-color configuration
 # https://github.com/Raymo111/i3lock-color
 
-fg=c0caf5
-wrong=db4b4b
-verify=7aa2f7
+# Colors
+FG_COLOR=c0caf5       # normal interface color
+WRONG_COLOR=db4b4b    # color for wrong password
+VERIFY_COLOR=7aa2f7   # color during password verification
 
-lock_image="$HOME/Images/screen-lock.png"
+# Lock screen image
+LOCK_IMAGE="$HOME/Images/screen-lock.png"
 
-# Используем magick вместо convert для ImageMagick 7
-magick $lock_image -resize 1366x768^ -gravity center -extent 1366x768 $lock_image
+# Resize image to full HD (or your screen resolution)
+# Using 'magick' instead of 'convert' for ImageMagick 7+
+magick "$LOCK_IMAGE" -resize 1366x768^ -gravity center -extent 1366x768 "$LOCK_IMAGE"
 
-# Запускаем i3lock с изображением
-i3lock -n --force-clock -i $lock_image -e --indicator --radius=20 \
---ring-width=40 --inside-color=$fg --ring-color=$fg --insidever-color=$verify \
---ringver-color=$verify --insidewrong-color=$wrong --ringwrong-color=$wrong \
---line-uses-inside --keyhl-color=$verify --separator-color=$verify --bshl-color=$verify \
---time-str="%H:%M" --time-size=100 --date-str="%a, %d %b" --date-size=45 --verif-text="Verifying Password..." \
---wrong-text="Wrong Password!" --noinput-text="" --greeter-text="Type the password to Unlock" --ind-pos="650:760" \
---time-font="Fira Code:style=Bold" --date-font="Fira Code:style=Bold" --verif-font="Fira Code" --greeter-font="Fira Code" \
---wrong-font="Fira Code" --verif-size=23 --greeter-size=23 --wrong-size=23 --time-pos="650:375" --date-pos="650:425" \
---greeter-pos="650:900" --wrong-pos="650:475" --verif-pos="650:900" --date-color="#FFFFFF" --time-color="#FFFFFF" --greeter-color=$fg \
---wrong-color=$wrong --verif-color=$verify --verif-pos="650:900" --pointer=default --refresh-rate=0 --pass-media-keys \
+# Launch i3lock with custom settings
+i3lock -n --force-clock \
+    -i "$LOCK_IMAGE" \
+    -e --indicator \
+    --radius=20 \
+    --ring-width=40 \
+    --inside-color=$FG_COLOR \
+    --ring-color=$FG_COLOR \
+    --insidever-color=$VERIFY_COLOR \
+    --ringver-color=$VERIFY_COLOR \
+    --insidewrong-color=$WRONG_COLOR \
+    --ringwrong-color=$WRONG_COLOR \
+    --line-uses-inside \
+    --keyhl-color=$VERIFY_COLOR \
+    --separator-color=$VERIFY_COLOR \
+    --bshl-color=$VERIFY_COLOR \
+    --time-str="%H:%M" \
+    --time-size=100 \
+    --date-str="%a, %d %b" \
+    --date-size=45 \
+    --verif-text="Verifying Password..." \
+    --wrong-text="Wrong Password!" \
+    --noinput-text="" \
+    --greeter-text="Type the password to Unlock" \
+    --ind-pos="650:760" \
+    --time-pos="650:375" \
+    --date-pos="650:425" \
+    --greeter-pos="650:900" \
+    --wrong-pos="650:475" \
+    --verif-pos="650:900" \
+    --date-color="#FFFFFF" \
+    --time-color="#FFFFFF" \
+    --greeter-color=$FG_COLOR \
+    --wrong-color=$WRONG_COLOR \
+    --verif-color=$VERIFY_COLOR \
+    --pointer=default \
+    --refresh-rate=0 \
+    --pass-media-keys \
+    --time-font="Fira Code:style=Bold" \
+    --date-font="Fira Code:style=Bold" \
+    --verif-font="Fira Code" \
+    --greeter-font="Fira Code" \
+    --wrong-font="Fira Code" \
+    --verif-size=23 \
+    --greeter-size=23 \
+    --wrong-size=23
