@@ -11,9 +11,19 @@ def read_packages(file: Path):
 def install_pacman_packages():
     clear()
     header("PACMAN PACKAGES")
-    for pkg in read_packages(BASE_DIR / "packages.txt"):
-        print(f"→ {pkg}")
-        run(f"pacman -S --needed {pkg}", sudo=True)
+
+    # ── Ask user about LightDM
+    choice = input("Do you want to install LightDM? [y/N]: ").strip().lower()
+    if choice == "y":
+        run("sudo pacman -S --needed lightdm lightdm-slick-greeter")
+        print("→ LightDM and LightDM Slick Greeter installed")
+    else:
+        print("→ Skipping LightDM installation")
+
+    # ── Install remaining packages from packages.txt
+    pkgs = read_packages(BASE_DIR / "packages.txt")
+    if pkgs:
+        run(f"sudo pacman -S --needed {' '.join(pkgs)}")
 
     # After installing packages, create symlink for Thunar terminal
     run("ln -sf /usr/bin/alacritty /usr/bin/xterm", sudo=True)
