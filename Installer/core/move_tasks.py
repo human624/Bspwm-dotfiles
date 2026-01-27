@@ -1,5 +1,5 @@
 from core.config import DOTFILES, HOME
-from core.utils import run, log_file, log_dir, log_skip, log_root, log_err, clear
+from core.utils import run, log_file, log_dir, log_skip, log_root, log_err, clear, require_root
 from core.ui import header
 from core.config_loader import load_config
 from pathlib import Path
@@ -56,13 +56,30 @@ def move_config(src: Path, dst: Path, exclude):
     run(f"chmod -R 700 '{dst}'")
 
 def install_lightdm():
+    require_root()
     clear()
     header("LIGHTDM")
+
+    # ── Wallpapers
+    wp_src = DOTFILES / "Images" / "screen-lock.png"
+    wp_dir = Path("/usr/share/wallpapers")
+    wp_dst = wp_dir / "screen-lock.png"
+
+    if not wp_src.exists():
+        log_err("screen-lock.png not found in Images/")
+    else:
+        run(f"mkdir -p '{wp_dir}'", sudo=True)
+        run(f"cp '{wp_src}' '{wp_dst}'", sudo=True)
+        log_root(wp_dst)
+
+    # ── LightDM config
     src = DOTFILES / ".config" / "LightDM"
     dst = Path("/etc/lightdm")
+
     if not src.exists():
         log_err("LightDM config not found")
         return
+
     run(f"cp -rT '{src}' '{dst}'", sudo=True)
     log_root(dst)
 
