@@ -1,3 +1,4 @@
 i3lock-color
 arc-gtk-theme
 qogir-cursor-theme
+xidlehook
