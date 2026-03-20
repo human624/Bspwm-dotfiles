@@ -1,86 +1,112 @@
 #!/usr/bin/env bash
 
-# === Настройка интерфейсов ===
-wifi_iface="wlan0"
-eth_iface="enp1s0f1"  # замените на ваш Ethernet интерфейс
+# --- Global Configuration ---
+readonly WIFI_IFACE="wlp2s0"
+readonly ETH_IFACE="enp1s0f1"
+readonly ROFI_BASE="rofi -dmenu -i -selected-row 0"
+readonly CONN_TIMEOUT=10
 
-# === Запуск NetworkManager через pkexec, если не активен ===
-if ! systemctl is-active --quiet NetworkManager; then
-    pkexec systemctl start NetworkManager
-fi
+# --- Helper Functions ---
+check_connection() {
+    local target_ssid="$1"
+    sleep 3
+    local active_now
+    active_now=$(nmcli -t -f NAME,DEVICE connection show --active | grep ":$WIFI_IFACE$" | cut -d: -f1)
+    [[ "$active_now" == "$target_ssid" ]]
+}
 
-# === Сохранённые Wi-Fi подключения ===
-saved_connections=$(nmcli -t -f NAME,TYPE connection show | grep '802-11-wireless' | cut -d: -f1)
+# --- Pre-flight Checks ---
+systemctl is-active --quiet NetworkManager || pkexec systemctl start NetworkManager
 
-# === Доступные сети Wi-Fi ===
-available_networks=$(nmcli --fields "SECURITY,SSID" device wifi list ifname "$wifi_iface" | sed 1d \
-    | sed 's/  */ /g' \
-    | sed -E "s/WPA*.?\S/ /g" \
-    | sed "s/^--/ /g" \
-    | sed "s/  //g" \
-    | sed "/--/d" \
-    | sed '/^$/d' \
-    | sed 's/^[ \t]*//;s/[ \t]*$//')
+# --- Data Acquisition ---
+current_ssid=$(nmcli -t -f NAME,DEVICE connection show --active | grep ":$WIFI_IFACE$" | cut -d: -f1)
+mapfile -t saved_connections < <(nmcli -t -f NAME,TYPE connection show | awk -F: '$2=="802-11-wireless" {print $1}')
+available_raw=$(nmcli -t -f "SECURITY,SSID" device wifi list ifname "$WIFI_IFACE" | sed 's/^--//' | sort -u)
 
-# === Формируем список для rofi ===
-wifi_list=""
-while read -r ssid; do
-    wifi_list+="  $ssid"$'\n'
-done <<< "$saved_connections"
-
-while read -r net; do
-    clean_ssid=$(echo "$net" | sed 's/^[ ]*//')
-    if ! echo "$saved_connections" | grep -Fxq "$clean_ssid"; then
-        wifi_list+="$net"$'\n'
-    fi
-done <<< "$available_networks"
-
-# === Преобразуем в массив ===
+# --- Build Rofi Menu ---
 options=()
-while IFS= read -r net; do
-    [ -n "$net" ] && options+=("$net")
-done <<< "$wifi_list"
 
-# === Получаем активное подключение Wi-Fi для кнопки Disconnect ===
-current_ssid=$(nmcli -t -f NAME,DEVICE connection show --active | grep ":$wifi_iface$" | cut -d: -f1)
+# 1. Active connection
+[[ -n "$current_ssid" ]] && options+=("󰖩  $current_ssid (Active)")
 
-if [ -n "$current_ssid" ]; then
-    options=("  Disconnect ($current_ssid)" "${options[@]}")
-fi
+# 2. Saved connections
+for ssid in "${saved_connections[@]}"; do
+    [[ -z "$ssid" || "$ssid" == "$current_ssid" ]] && continue
+    options+=("  $ssid")
+done
 
-# === Проверяем состояние Ethernet ===
-eth_state=$(nmcli -t -f DEVICE,STATE dev | grep "^$eth_iface:" | cut -d: -f2)
-if [ "$eth_state" = "connected" ]; then
-    eth_icon="󰈁"
-else
-    eth_icon="󰈂"
-fi
-
-# === Запуск rofi ===
-chosen_network=$(printf '%s\n' "${options[@]}" | rofi -dmenu -i -selected-row 0 -lines 10 -width 30 -p "($eth_icon) Wi-Fi SSID:")
-[ -z "$chosen_network" ] && exit 0
-chosen_id=$(echo "$chosen_network" | sed 's/^[ ]*//' | xargs)
-
-# === Обработка выбора Disconnect ===
-if [[ "$chosen_network" =~ "Disconnect" ]]; then
-    nmcli device disconnect "$wifi_iface"
-    notify-send "Wi-Fi disconnected"
-    exit 0
-fi
-
-# === Подключение к сети ===
-success_message="You are now connected to \"$chosen_id\"."
-nmcli device set "$wifi_iface" managed yes
-
-if echo "$saved_connections" | grep -wq "$chosen_id"; then
-    nmcli connection up id "$chosen_id" && notify-send "Connected" "$success_message"
-elif [[ "$chosen_network" =~ "" ]]; then
-    wifi_password=$(rofi -dmenu -p "Password: ")
-    if [ -n "$wifi_password" ]; then
-        nmcli device wifi connect "$chosen_id" password "$wifi_password" && notify-send "Connected" "$success_message"
-    else
-        notify-send "No password entered"
+# 3. Available networks in range
+while IFS=: read -r security ssid; do
+    [[ -z "$ssid" ]] && continue
+    if [[ ! " ${options[*]} " =~ " $ssid " ]]; then
+        icon=" "
+        [[ "$security" =~ "WPA" ]] && icon=" "
+        options+=("$icon $ssid")
     fi
+done <<< "$available_raw"
+
+# --- User Selection ---
+eth_state=$(nmcli -t -f DEVICE,STATE dev | grep "^$ETH_IFACE:" | cut -d: -f2)
+eth_icon=$([[ "$eth_state" == "connected" ]] && echo "󰈁" || echo "󰈂")
+
+chosen_network=$(printf '%s\n' "${options[@]}" | $ROFI_BASE -p "($eth_icon) Wi-Fi:")
+[[ -z "$chosen_network" ]] && exit 0
+
+chosen_id=$(echo "$chosen_network" | sed -E 's/^[󰖩 ]*//; s/ \(Active\)//' | xargs)
+
+# --- Connection Range Validation ---
+if [[ "$chosen_network" != *"(Active)"* ]]; then
+    if ! echo "$available_raw" | grep -q ":$chosen_id$"; then
+        notify-send "Error" "Network '$chosen_id' is not in range" -u critical
+        exit 1
+    fi
+fi
+
+# --- Active Network Submenu ---
+if [[ "$chosen_network" == *"(Active)"* ]]; then
+    action=$(echo -e "󰑐 Reconnect\n󰅖 Disconnect" | $ROFI_BASE -p "Action for $chosen_id:")
+    
+    case "$action" in
+        *Reconnect)
+            notify-send "Wi-Fi" "Reconnecting to $chosen_id..."
+            nmcli device disconnect "$WIFI_IFACE" >/dev/null 2>&1
+            sleep 1
+            nmcli --wait $CONN_TIMEOUT connection up id "$chosen_id" >/dev/null 2>&1
+            
+            if check_connection "$chosen_id"; then
+                notify-send "Wi-Fi" "Successfully reconnected to $chosen_id" -i network-transmit-receive
+            else
+                notify-send "Error" "Reconnect to $chosen_id failed" -u critical -i network-error
+            fi
+            exit 0 ;;
+            
+        *Disconnect)
+            nmcli device disconnect "$WIFI_IFACE"
+            notify-send "Wi-Fi" "Disconnected from $chosen_id"
+            exit 0 ;;
+            
+        *) exit 0 ;;
+    esac
+fi
+
+# --- Connection Logic ---
+nmcli device set "$WIFI_IFACE" managed yes
+notify-send "Wi-Fi" "Connecting to $chosen_id..."
+
+if printf '%s\n' "${saved_connections[@]}" | grep -qx "$chosen_id"; then
+    nmcli --wait $CONN_TIMEOUT connection up id "$chosen_id" >/dev/null 2>&1
+elif [[ "$chosen_network" == ""* ]]; then
+    wifi_password=$($ROFI_BASE -p "Password for $chosen_id: ")
+    [[ -z "$wifi_password" ]] && exit 0
+    nmcli --wait $CONN_TIMEOUT device wifi connect "$chosen_id" password "$wifi_password" >/dev/null 2>&1
 else
-    nmcli device wifi connect "$chosen_id" && notify-send "Connected" "$success_message"
+    nmcli --wait $CONN_TIMEOUT device wifi connect "$chosen_id" >/dev/null 2>&1
+fi
+
+# --- Final Validation ---
+if check_connection "$chosen_id"; then
+    notify-send "Wi-Fi" "Connected to $chosen_id"
+else
+    notify-send "Error" "Connection to $chosen_id failed" -u critical
+    nmcli device disconnect "$WIFI_IFACE" >/dev/null 2>&1
 fi
