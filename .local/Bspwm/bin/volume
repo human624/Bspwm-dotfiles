@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
+# Unique ID to replace the same notification bubble instead of stacking them
 NOTIFY_ID=9999
 
 notify() {
-    notify-send -u low -r "$NOTIFY_ID" -t 600 "$1" "$2"
+    # -r: replaces the notification with the same ID
+    # -t: timeout in milliseconds
+    # -u low: prevents the notification from interrupting "Do Not Disturb" modes
+    notify-send -u low -r "$NOTIFY_ID" -t 800 "$1" "$2"
 }
 
 # Volume controls
@@ -19,7 +23,7 @@ volume_down() {
 
 toggle_mute() {
     pamixer -t
-    if pamixer --get-mute | grep -q true; then
+    if pamixer --get-mute; then
         notify "Volume" "Muted"
     else
         notify "Volume" "$(pamixer --get-volume)%"
@@ -27,27 +31,24 @@ toggle_mute() {
 }
 
 # Brightness controls
-brightness_percent() {
-    brightnessctl i | grep -o '(.*%)' | tr -d '()%'
-}
-
 brightness_up() {
     brightnessctl s +5% > /dev/null
-    notify "Brightness" "$(brightness_percent)%"
+    notify "Brightness" "$(brightnessctl -m | cut -d, -f4)"
 }
 
 brightness_down() {
+    # Decrease brightness, but prevents reaching 0% (optional safety)
     brightnessctl s 5%- > /dev/null
-    notify "Brightness" "$(brightness_percent)%"
+    notify "Brightness" "$(brightnessctl -m | cut -d, -f4)"
 }
 
-# Dispatcher
+# Command Dispatcher
 case "${1:-}" in
-    volume-up)         volume_up ;;
-    volume-down)       volume_down ;;
-    toggle-mute)       toggle_mute ;;
-    brightness-up)     brightness_up ;;
-    brightness-down)   brightness_down ;;
+    volume-up)        volume_up ;;
+    volume-down)      volume_down ;;
+    toggle-mute)      toggle_mute ;;
+    brightness-up)    brightness_up ;;
+    brightness-down)  brightness_down ;;
     *)
         echo "Usage: $0 {volume-up|volume-down|toggle-mute|brightness-up|brightness-down}"
         exit 1
