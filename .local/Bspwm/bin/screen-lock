@@ -1,63 +1,78 @@
 #!/bin/bash
 
-# i3lock-color configuration
-# https://github.com/Raymo111/i3lock-color
+# --- Appearance Configuration ---
+FG_COLOR=c0caf5
+WRONG_COLOR=db4b4b
+VERIFY_COLOR=7aa2f7
+FONT="JetBrains Mono"
 
-# Colors
-FG_COLOR=c0caf5       # normal interface color
-WRONG_COLOR=db4b4b    # color for wrong password
-VERIFY_COLOR=7aa2f7   # color during password verification
-
-# Lock screen image
+# --- Assets & Paths ---
 LOCK_IMAGE="$HOME/Images/screen-lock.png"
+TEMP_IMAGE="/tmp/i3lock_prepared.png"
 
-# Resize image to full HD (or your screen resolution)
-# Using 'magick' instead of 'convert' for ImageMagick 7+
-magick "$LOCK_IMAGE" -resize 1366x768^ -gravity center -extent 1366x768 "$LOCK_IMAGE"
+# --- Pre-Lock Actions ---
+# Force US layout to avoid password entry errors
+setxkbmap us
 
-# Launch i3lock with custom settings
+# Prepare background image if not exists
+if [ ! -f "$TEMP_IMAGE" ]; then
+    magick "$LOCK_IMAGE" -resize 1366x768^ -gravity center -extent 1366x768 "$TEMP_IMAGE"
+fi
+
+# --- Execution ---
 i3lock -n --force-clock \
-    -i "$LOCK_IMAGE" \
+    -i "$TEMP_IMAGE" \
     -e --indicator \
     --radius=20 \
     --ring-width=40 \
+    --pointer=default \
+    --refresh-rate=0 \
+    --pass-media-keys \
+    --line-uses-inside \
+    \
     --inside-color=$FG_COLOR \
     --ring-color=$FG_COLOR \
     --insidever-color=$VERIFY_COLOR \
     --ringver-color=$VERIFY_COLOR \
     --insidewrong-color=$WRONG_COLOR \
     --ringwrong-color=$WRONG_COLOR \
-    --line-uses-inside \
     --keyhl-color=$VERIFY_COLOR \
     --separator-color=$VERIFY_COLOR \
     --bshl-color=$VERIFY_COLOR \
+    \
     --time-str="%H:%M" \
     --time-size=100 \
+    --time-pos="650:375" \
+    --time-color="#FFFFFF" \
+    --time-font="$FONT:style=Bold" \
+    \
     --date-str="%a, %d %b" \
     --date-size=45 \
-    --verif-text="Verifying Password..." \
-    --wrong-text="Wrong Password!" \
-    --noinput-text="" \
-    --greeter-text="Type the password to Unlock" \
-    --ind-pos="650:760" \
-    --time-pos="650:375" \
     --date-pos="650:425" \
-    --greeter-pos="650:900" \
-    --wrong-pos="650:475" \
-    --verif-pos="650:900" \
     --date-color="#FFFFFF" \
-    --time-color="#FFFFFF" \
-    --greeter-color=$FG_COLOR \
-    --wrong-color=$WRONG_COLOR \
-    --verif-color=$VERIFY_COLOR \
-    --pointer=default \
-    --refresh-rate=0 \
-    --pass-media-keys \
-    --time-font="Fira Code:style=Bold" \
-    --date-font="Fira Code:style=Bold" \
-    --verif-font="Fira Code" \
-    --greeter-font="Fira Code" \
-    --wrong-font="Fira Code" \
-    --verif-size=23 \
+    --date-font="$FONT:style=Bold" \
+    \
+    --greeter-text="Type the password to Unlock" \
     --greeter-size=23 \
-    --wrong-size=23
+    --greeter-pos="650:900" \
+    --greeter-color=$FG_COLOR \
+    --greeter-font="$FONT" \
+    \
+    --verif-text="Verifying Password..." \
+    --verif-size=23 \
+    --verif-pos="650:900" \
+    --verif-color=$VERIFY_COLOR \
+    --verif-font="$FONT" \
+    \
+    --wrong-text="Wrong Password!" \
+    --wrong-size=23 \
+    --wrong-pos="650:475" \
+    --wrong-color=$WRONG_COLOR \
+    --wrong-font="$FONT" \
+    \
+    --ind-pos="650:760" \
+    --noinput-text=""
+
+# --- Post-Unlock Actions ---
+# Restore US/RU layouts and Alt+Shift toggle
+setxkbmap -layout us,ru -option grp:alt_shift_toggle
