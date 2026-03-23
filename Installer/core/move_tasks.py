@@ -1,5 +1,5 @@
 from core.config import DOTFILES, HOME
-from core.utils import run, log_file, log_dir, log_skip, log_root, log_err, clear, require_root
+from core.utils import run, log_file, log_dir, log_skip, log_root, log_err, log_info, clear, require_root, CYAN, RESET
 from core.ui import header
 from core.config_loader import load_config
 from pathlib import Path
@@ -45,6 +45,12 @@ def move_dotfiles():
             move_config(item, target, EXCLUDE_CONFIG)
         else:
             copy_item(item, target)
+    # ── Configuring Batsignal (Systemd) ──
+    print(f"\n{CYAN}→ Configuring batsignal service...{RESET}")
+    run("systemctl --user daemon-reload")
+    run("systemctl --user enable batsignal.service")
+    run("systemctl --user restart batsignal.service")
+    log_info("Batsignal service enabled and started.")
 
 def move_config(src: Path, dst: Path, exclude):
     dst.mkdir(exist_ok=True)
