@@ -84,7 +84,9 @@ poppler-glib
 flameshot
 thunar-volman
 engrampa
-parole
+mpv
+libva-intel-driver
+libva-utils
 gpick
 imagemagick
 firewalld
