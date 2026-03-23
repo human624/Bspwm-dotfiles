@@ -214,6 +214,42 @@ Join hundreds of users who enjoy **fast, organized, and elegant workspace manage
 
 </details>
 
+<details>
+  <summary>Hotkeys for MPV Player</summary>
+
+  ### **Playback Control**
+  - `Left` / `Right`: Exact seek backward/forward 5 seconds.
+  - `Shift+Left` / `Shift+Right`: Exact seek backward/forward 30 seconds.
+  - `[` / `]`: Decrease/increase playback speed by 0.25x.
+  - `\`: Reset playback speed to 1.0x.
+  - `q`: Quit player.
+
+  ### **Video & Aspect Ratio**
+  - `A`: Cycle aspect ratios (16:9 -> 4:3 -> 2.35:1 -> Reset).
+  - `ctrl+s`: Take asynchronous screenshot.
+  - `alt+i`: Show list of all active hotkeys.
+
+  ### **Audio & Volume**
+  - `Mouse Wheel` / `Up` / `Down`: Change volume by 5%.
+  - `m`: Toggle mute.
+  - `a`: Open audio track selection menu.
+  - `ctrl++` / `ctrl+-`: Adjust audio delay by 100ms.
+
+  ### **Subtitles**
+  - `v`: Toggle subtitle visibility.
+  - `s`: Open subtitle selection menu.
+  - `S`: Load external subtitle file.
+  - `z` / `x`: Adjust subtitle delay by 100ms.
+
+  ### **Navigation & Menus (uosc)**
+  - `RMB (Right Click)`: Main context menu.
+  - `p`: Playlist / current items.
+  - `c`: Chapters menu.
+  - `o`: Open file via built-in browser.
+  - `O`: Show current file in system file manager.
+
+</details>
+
 ## 🛠️ Installer
 
 This **Installer** is designed for a smooth setup of Bspwm-dotfiles.  
