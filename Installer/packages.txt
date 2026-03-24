@@ -9,6 +9,7 @@ feh
 alacritty
 neovim
 ripgrep
+fd
 git
 fastfetch
 rofi
@@ -88,6 +89,7 @@ mpv
 libva-intel-driver
 libva-utils
 gpick
+socat
 imagemagick
 firewalld
 libinput
