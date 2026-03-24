@@ -1,16 +1,16 @@
 #
-# Основные действия
+# Main actions
 #
 
-# Перезагружает конфигурацию sxhkd:
+# Reload sxhkd configuration:
 super + Escape + r
     pkill -USR1 -x sxhkd; notify-send 'sxhkd' 'Config restarted' -t 1500
 	
-# Запуск терминала
+# Launch terminal
 super + Return
     alacritty
 
-# Показать/Скрыть Polybar
+# Show/Hide Polybar
 super + p
 	sh $HOME/.local/Bspwm/bin/toggle-polybar
 
@@ -18,21 +18,21 @@ super + p
 super + w
 	sh $HOME/.local/Bspwm/bin/random_wallpaper
 
-# Изменить язык
+# Change language
 Alt_L + shift
 	sh $HOME/.local/Bspwm/bin/change_language.sh
 
 Shift_L + alt
 	sh $HOME/.local/Bspwm/bin/change_language.sh
     
-# Открыть rofi меню
+# Open rofi menu
 super + d
     {rofi -show drun}
     
 super + x
     {sh $HOME/.local/Bspwm/bin/powermenu}
 
-# Запуск приложений
+# Launch applications
 super + shift + {f,n,p,i,l,x}
 	{firefox, \
 	thunar, \
@@ -41,7 +41,7 @@ super + shift + {f,n,p,i,l,x}
 	sh $HOME/.local/Bspwm/bin/screen-lock, \
 	sh $HOME/.local/Bspwm/bin/xcolor-pick}
      
-# Изменение громкости через fn    
+# Change volume via fn    
 XF86AudioRaiseVolume
     sh $HOME/.local/Bspwm/bin/volume volume-up
 
@@ -51,90 +51,102 @@ XF86AudioLowerVolume
 XF86AudioMute
     sh $HOME/.local/Bspwm/bin/volume toggle-mute
 
-# Изменение яркости через fn 
+# Change brightness via fn 
 XF86MonBrightnessUp
     sh $HOME/.local/Bspwm/bin/volume brightness-up
 
 XF86MonBrightnessDown
     sh $HOME/.local/Bspwm/bin/volume brightness-down
 
-# Снимок экрана
+# Pause/Play (global)
+XF86AudioPlay
+    echo 'cycle pause' | socat - /tmp/mpvsocket
+
+# Next track/video
+XF86AudioNext
+    echo 'playlist-next' | socat - /tmp/mpvsocket
+
+# Previous track/video
+XF86AudioPrev
+    echo 'playlist-prev' | socat - /tmp/mpvsocket
+
+# Screenshot
 Print
     flameshot gui
 
 #
-# Горячие клавиши BSPWM
+# BSPWM hotkeys
 #
 
-# Выключить/Перезагрузить bspwm
+# Quit/Restart bspwm
 ctrl + shift + {q,r}
     bspc {quit,wm -r}
 
-# Принудительно закрыть окно
+# Force close window
 super + c
     bspc node -c
 
-# Переключение между плиточным и монокль-режимом
+# Toggle between tiled and monocle mode
 super + space
 	bspc node -t "~"{floating,tiled}
 
 #
-# Состояние/Флаги
+# State/Flags
 #
 
-# Установить состояние окна
+# Set window state
 super + {t,ctrl + t,f}
 	bspc node -t {tiled,pseudo_tiled,fullscreen}
 	
 
-# Переключиться на следующее окно, включая плавающее
+# Switch to next window including floating
 alt + {_,shift + }Tab
     bspc node -f {next.local,prev.local}
 
 #
-# Фокус/Обмен
+# Focus/Swap
 #
 
-# Фокус на последнем окне/рабочем столе
+# Focus the last window/desktop
 super + {grave,Tab}
 	bspc {node,desktop} -f last
 
-# Отправить текущее окно на текущий рабочий стол
+# Send the current window to the given desktop
 super + {_,shift + }{1-9,0}
 	bspc {desktop -f,node -d} '^{1-9,10}'
 
 #
-# Предварительный выбор
+# Preselection
 #
 
-# Предварительно установить соотношение
+# Preselect ratio
 super + ctrl + {1-9}
 	bspc node -o 0.{1-9}
 
-# Отменить предварительное соотношение для активного окна
+# Cancel preselection for the focused node
 super + ctrl + space
 	bspc node -p cancel
 
-# Отменить предварительное соотношение для активного рабочего стола
+# Cancel preselection for the focused desktop
 super + ctrl + shift + space
 	bspc query -N -d | xargs -I id -n 1 bspc node id -p cancel
 
 #
-# перемещение/изменение размера
+# Move/resize
 #
 
-# Расширение окна
+# Expand window
 super + ctrl + {h,j,k,l}
     bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
 
-# Отправить окно на другой край экрана
+# Send window to another edge of the screen
 super + {_,alt + }{h,j,k,l}
     bspc node -{f,s} {west,south,north,east}
 
-# Установить флаги окна
+# Set window flags
 super + ctrl + {m,x,y,z}
 	bspc node -g {marked,locked,sticky,private}
 
-# Поменять текущее окно с самым большим окном
+# Swap the current window with the biggest window
 super + g
 	bspc node -s biggest.window
