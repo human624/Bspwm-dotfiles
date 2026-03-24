@@ -1,155 +1,78 @@
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
-
+  "logo": {
+     "source": "arch",
+     "padding": {
+       "top": 2, 
+       "left": 2,
+       "right": 4 
+     },
+     "color": {
+       "1": "blue",
+       "2": "cyan"
+     }
+   }, 
   "display": {
-    "separator": "› "
+    "separator": " › ",
+    "temp": {
+      "unit": "C",
+      "ndigits": 0
+    },
+    "color": {
+      "keys": "magenta"
+    }
   },
   "modules": [
     {
       "type": "custom",
-      "format": "\u001b[36m╭───────────────────────────── \u001b[32mSoftware \u001b[36m────────────────────────────╮"
+      "format": "\u001b[34m╭───────────────────────────── \u001b[36mSoftware \u001b[34m────────────────────────────╮"
     },
-    {
-      "type": "os",
-      "key": "│ OS",
-      "keyColor": "cyan"
-    },
-    {
-      "type": "kernel",
-      "key": "│ Kernel",
-      "keyColor": "cyan"
-    },
-    {
-      "type": "packages",
-      "key": "│ Packages",
-      "keyColor": "cyan"
-    },
-    {
-      "type": "shell",
-      "key": "│ Shell",
-      "keyColor": "cyan"
-    },
-    {
-      "type": "de",
-      "key": "│ Desktop Environment",
-      "keyColor": "cyan"
-    },
-    {
-      "type": "wm",
-      "key": "│ Window Manager",
-      "keyColor": "cyan"
-    },
-    {
-      "type": "terminal",
-      "key": "│ Terminal",
-      "keyColor": "cyan"
-    },
-
- {
-      "type": "custom",
-      "format": "\u001b[36m├───────────────────────────── \u001b[32mHardware \u001b[36m────────────────────────────┤"
-    },
-    {
-      "type": "host",
-      "key": "│ Host",
-      "keyColor": "cyan"
-    },
-    {
-      "type": "bios",
-      "key": "│ BIOS",
-      "keyColor": "cyan"
-    },
-    {
-      "type": "cpu",
-      "key": "│ CPU",
-      "keyColor": "cyan"
-    },
-    {
-      "type": "gpu",
-      "key": "│ GPU",
-      "keyColor": "cyan"
-    },
-    {
-      "type": "memory",
-      "key": "│ Memory",
-      "keyColor": "cyan"
-    },
-    {
-      "type": "physicalMemory",
-      "key": "│ Physical Memory",
-      "keyColor": "cyan"
-    },
-    {
-      "type": "disk",
-      "key": "│ Disk",
-      "keyColor": "cyan"
-    },
-    {
-      "type": "physicalDisk",
-      "key": "│ Physical Disk",
-      "keyColor": "cyan"
-    },
-    {
-      "type": "battery",
-      "key": "│ Battery",
-      "keyColor": "cyan"
-    },
-
+    { "type": "os", "key": "│  OS", "keyColor": "blue" },
+    { "type": "kernel", "key": "│ 󰌽 Kernel", "keyColor": "blue" },
+    { "type": "packages", "key": "│ 󰏖 Packages", "keyColor": "blue" },
+    { "type": "shell", "key": "│  Shell", "keyColor": "blue" },
+    { "type": "de", "key": "│ 󰇧 Desktop", "keyColor": "blue" },
+    { "type": "wm", "key": "│  WM", "keyColor": "blue" },
+    { "type": "terminal", "key": "│  Terminal", "keyColor": "blue" },
 
     {
       "type": "custom",
-      "format": "\u001b[36m├─────────────────────────── \u001b[32mPerformance \u001b[36m───────────────────────────┤"
+      "format": "\u001b[32m├───────────────────────────── \u001b[32mHardware \u001b[32m────────────────────────────┤"
     },
-    {
-      "type": "uptime",
-      "key": "│ Uptime",
-      "keyColor": "cyan"
+    { "type": "host", "key": "│ 󰌢 Host", "keyColor": "green" },
+    { 
+      "type": "cpu", 
+      "key": "│  CPU", 
+      "keyColor": "green",
+      "temp": true 
     },
-    {
-      "type": "loadavg",
-      "key": "│ Load Average",
-      "keyColor": "cyan"
-    },
-    
+    { "type": "gpu", "key": "│ 󰢮 GPU", "keyColor": "green", "temp": true },
+    { "type": "memory", "key": "│ 󰍛 Memory", "keyColor": "green" },
+    { "type": "disk", "key": "│ 󰋊 Disk", "keyColor": "green" },
+    { "type": "battery", "key": "│ 󰁹 Battery", "keyColor": "green", "temp": true },
+
     {
       "type": "custom",
-      "format": "\u001b[36m├──────────────────────────── \u001b[32mAppearance \u001b[36m───────────────────────────┤"
+      "format": "\u001b[33m├─────────────────────────── \u001b[33mPerformance \u001b[33m───────────────────────────┤"
     },
-    {
-      "type": "theme",
-      "key": "│ Theme",
-      "keyColor": "cyan"
-    },    
-    {
-      "type": "icons",
-      "key": "│ Icons",
-      "keyColor": "cyan"
-    },
-    {
-      "type": "font",
-      "key": "│ Font",
-      "keyColor": "cyan"
-    },
-    {
-      "type": "cursor",
-      "key": "│ Cursor",
-      "keyColor": "cyan"
-    },
-    {
-      "type": "terminalfont",
-      "key": "│ TerminalFont",
-      "keyColor": "cyan"
-    },        
+    { "type": "uptime", "key": "│ 󰥔 Uptime", "keyColor": "yellow" },
+    { "type": "loadavg", "key": "│ 󰓅 Load Average", "keyColor": "yellow" },
+
     {
       "type": "custom",
-      "format": "\u001b[36m╰───────────────────────────────────────────────────────────────────╯"
+      "format": "\u001b[35m├──────────────────────────── \u001b[35mAppearance \u001b[35m───────────────────────────┤"
     },
-    {
-      "type": "colors"
-    },
+    { "type": "theme", "key": "│ 󰉼 Theme", "keyColor": "magenta" },
+    { "type": "icons", "key": "│ 󰀻 Icons", "keyColor": "magenta" },
+    { "type": "font", "key": "│ 󰛖 Font", "keyColor": "magenta" },
+    { "type": "cursor", "key": "│ 󰇀 Cursor", "keyColor": "magenta" },
+    { "type": "terminalfont", "key": "│ 󰛖 Term Font", "keyColor": "magenta" },
+
     {
       "type": "custom",
-      "format": " "
-    }
+      "format": "\u001b[35m╰───────────────────────────────────────────────────────────────────╯"
+    },
+    { "type": "colors", "symbol": "circle" },
+    { "type": "custom", "format": " " }
   ]
 }
