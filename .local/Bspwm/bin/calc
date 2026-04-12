@@ -1,0 +1,3 @@
+#!/bin/bash
+
+rofi -show calc -modi calc -no-show-match -terse -no-unicode -no-sort -no-bold -no-history -calc-command "echo -n '{result}' | xclip -selection clipboard"

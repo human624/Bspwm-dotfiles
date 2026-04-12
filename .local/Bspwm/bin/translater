@@ -1,0 +1,133 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# =========================
+# CONFIG
+# =========================
+
+LAST_FILE="$HOME/.rofi_trans_last"
+HISTORY_FILE="$HOME/.rofi_trans_history"
+
+LANGS=("auto" "en" "ru" "fr" "de" "es" "it" "ja" "zh" "ko")
+
+# Icons (clean + minimal)
+ICON_TRANSLATE="󰊿"
+ICON_SWAP="󰯎"
+ICON_SOURCE="󰘳"
+ICON_TARGET="󰘴"
+ICON_HISTORY="󰋚"
+
+# =========================
+# DEPENDENCIES CHECK
+# =========================
+
+for cmd in rofi trans xclip notify-send; do
+  command -v "$cmd" >/dev/null 2>&1 || {
+    echo "Missing dependency: $cmd"
+    exit 1
+  }
+done
+
+# =========================
+# LOAD STATE
+# =========================
+
+if [[ -f "$LAST_FILE" ]]; then
+  read -r SRC TGT < "$LAST_FILE"
+else
+  SRC="auto"
+  TGT="en"
+fi
+
+# =========================
+# FUNCTIONS
+# =========================
+
+choose_lang() {
+  printf "%s\n" "${LANGS[@]}" | rofi -dmenu -p "Select language:" || return 1
+}
+
+translate_text() {
+  local text="$1"
+
+  local result
+  result=$(trans -b "${SRC}:${TGT}" "$text" 2>/dev/null || true)
+
+  [[ -z "$result" ]] && {
+    notify-send "Rofi Translate" "Translation error"
+    return 1
+  }
+
+  echo "$result"
+}
+
+save_history() {
+  local text="$1"
+  local result="$2"
+  printf "[%s] %s -> %s\n" "$(date '+%F %T')" "$text" "$result" >> "$HISTORY_FILE"
+}
+
+# =========================
+# MAIN LOOP
+# =========================
+
+while true; do
+
+  ACTION=$(printf "%s Translate\n%s Swap languages\n%s Source: %s\n%s Target: %s\n%s History\n" \
+    "$ICON_TRANSLATE" \
+    "$ICON_SWAP" \
+    "$ICON_SOURCE" "$SRC" \
+    "$ICON_TARGET" "$TGT" \
+    "$ICON_HISTORY" \
+  | rofi -dmenu -p "Menu:")
+
+  # ESC -> exit
+  [[ -z "${ACTION:-}" ]] && break
+
+  case "$ACTION" in
+
+    *Translate)
+      TEXT=$(rofi -dmenu -p "Enter text:" || true)
+      [[ -z "${TEXT:-}" ]] && continue
+
+      RESULT=$(translate_text "$TEXT") || continue
+
+      CHOICE=$(printf "%s" "$RESULT" | rofi -dmenu -p "Enter = copy")
+
+      [[ -z "${CHOICE:-}" ]] && continue
+
+      printf "%s" "$CHOICE" | xclip -selection clipboard
+      notify-send "Rofi Translate" "Copied to clipboard"
+      save_history "$TEXT" "$RESULT"
+      ;;
+
+    *Swap*)
+      tmp="$SRC"
+      SRC="$TGT"
+      TGT="$tmp"
+      ;;
+
+    *Source*)
+      NEW=$(choose_lang) || continue
+      [[ -n "${NEW:-}" ]] && SRC="$NEW"
+      ;;
+
+    *Target*)
+      NEW=$(choose_lang) || continue
+      [[ -n "${NEW:-}" ]] && TGT="$NEW"
+      ;;
+
+    *History*)
+      [[ -f "$HISTORY_FILE" ]] && rofi -dmenu -p "History" < "$HISTORY_FILE"
+      ;;
+
+  esac
+
+done
+
+# =========================
+# SAVE STATE
+# =========================
+
+echo "$SRC $TGT" > "$LAST_FILE"

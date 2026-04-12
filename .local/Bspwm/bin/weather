@@ -1,0 +1,22 @@
+#!/bin/bash
+# Укажи свой город
+CITY="Moscow"
+
+# Получаем иконку и температуру отдельно, чтобы убрать лишние пробелы
+# Мы используем xargs для удаления лишних пробелов по краям
+get_weather() {
+    local day=$1
+    # Запрашиваем: иконка (%c), температура (%t), описание (%C)
+    # Используем sed 's/  */ /g', чтобы превратить двойные пробелы в один
+    curl -s "wttr.in/${CITY}/${day}?format=%c%t,+%C&lang=ru" | sed 's/  */ /g' | xargs
+}
+
+TODAY=$(get_weather "")
+TOMORROW=$(get_weather "1")
+DATOMORROW=$(get_weather "2")
+
+# Формируем итоговое сообщение
+MESSAGE="Сегодня: $TODAY\nЗавтра: $TOMORROW\nПослезавтра: $DATOMORROW"
+
+# Отправляем уведомление
+notify-send "Погода в $CITY" "$MESSAGE" -t 10000 -i weather-few-clouds 
