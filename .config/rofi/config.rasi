@@ -24,11 +24,12 @@ element-text, element-icon , mode-switcher {
 }
 
 window {
-    height: 275px;   // было 275px
-    width: 450px;    // было 450px
+    height: 275px;
+    width: 450px;
     border: 3px;
     border-color: @border-col;
     background-color: @bg-col;
+    border-radius: 12px;
 }
 
 mainbox {
