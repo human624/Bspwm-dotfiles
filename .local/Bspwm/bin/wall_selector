@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Path to wallpaper folder
+WALLPAPER_DIR="$HOME/Images/"
+
+# Check if the folder exists
+if [ ! -d "$WALLPAPER_DIR" ]; then
+  notify-send "Error" "Wallpaper folder not found: $WALLPAPER_DIR"
+  exit 1
+fi
+
+# List of files for selection (images only)
+SELECTION=$(ls "$WALLPAPER_DIR" | rofi -dmenu -i -p "Select wallpaper" -theme-str 'window {width: 30%;}')
+
+# If user closes rofi, do nothing
+if [ -z "$SELECTION" ]; then
+  exit 0
+fi
+
+# Full path to selected file
+FULL_PATH="$WALLPAPER_DIR/$SELECTION"
+
+# Set wallpaper using feh (--bg-fill fills the screen)
+feh --bg-fill "$FULL_PATH"
+
+# Optional: save path for autostart (e.g. .fehbg)
+echo "feh --bg-fill '$FULL_PATH'" >"$HOME/.fehbg"
+
+notify-send "Wallpaper" "Wallpaper changed to $SELECTION"
