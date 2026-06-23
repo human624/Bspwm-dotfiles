@@ -3,7 +3,7 @@
 pgrep -x sxhkd > /dev/null || sxhkd &
 
 # Создаём рабочие столы на основном мониторе
-bspc monitor -d 1 2 3 4 5
+bspc monitor -d 1 2 3 4 5 6 7 8 9
 
 # Window borders (Auto-Generate)
 bspc config focus_follows_pointer true
@@ -44,7 +44,8 @@ sh ~/.config/polybar/launch.sh
 dunst -config $HOME/.config/bspwm/dunstrc &
 
 # start compositor
-picom --config $HOME/.config/bspwm/picom_configurations/1.conf &
+#picom --config $HOME/.config/bspwm/picom_configurations/1.conf &
+picom --config $HOME/.config/bspwm/picom_configurations/picom_animation/picom.conf &
 
 # Launch Polkit agent for GUI authentication
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
@@ -52,3 +53,5 @@ picom --config $HOME/.config/bspwm/picom_configurations/1.conf &
 # run cursor tracker
 xidlehook --timer 600 "$HOME/.local/Bspwm/bin/screen-lock" '' &
 
+# start redshift
+pgrep -x redshift > /dev/null || redshift -m randr &
