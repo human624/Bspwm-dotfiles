@@ -1,0 +1,288 @@
+#!/usr/bin/env bash
+
+# ────────────────────── Files and directories ──────────────────────
+HISTORY_FILE="$HOME/.cache/yt_search_history"
+WATCH_HISTORY="$HOME/.cache/yt_watch_history"
+CACHE_DIR="$HOME/.cache/yt_player"
+PLAYLISTS_DIR="$HOME/.cache/yt_playlists"
+
+mkdir -p "$HOME/.cache" "$CACHE_DIR" "$PLAYLISTS_DIR"
+touch "$HISTORY_FILE" "$WATCH_HISTORY"
+
+# ────────────────────── Dependency check ──────────────────────
+check_dependencies() {
+  for cmd in yt-dlp fzf jq; do
+    if ! command -v "$cmd" &>/dev/null; then
+      echo "❌ Required: $cmd"
+      exit 1
+    fi
+  done
+
+  if ! command -v mpv &>/dev/null && ! command -v vlc &>/dev/null; then
+    echo "❌ Required: mpv or vlc"
+    exit 1
+  fi
+}
+
+get_player() {
+  if command -v mpv &>/dev/null; then
+    echo "mpv"
+  else
+    echo "vlc"
+  fi
+}
+PLAYER=$(get_player)
+
+# ────────────────────── YouTube Search ──────────────────────
+search_youtube() {
+  local query=$1
+  if [[ -z "$query" ]]; then
+    echo "❌ Empty query"
+    sleep 1
+    return
+  fi
+
+  echo "🔍 Searching..."
+  raw_results=$(yt-dlp "ytsearch20:$query" \
+    --flat-playlist \
+    --no-warnings \
+    --print "%(title)s	%(uploader)s	%(id)s	%(view_count)s" 2>/dev/null)
+
+  if [[ -z "$raw_results" ]]; then
+    echo "❌ No results found"
+    sleep 2
+    return
+  fi
+
+  formatted=$(echo "$raw_results" | awk -F'\t' '{
+    title = substr($1,1,80);
+    uploader = substr($2,1,18);
+    views = $4;
+    if (views==""||views=="None") views="N/A";
+    else if (views>=1000000) views=int(views/1000000)"M";
+    else if (views>=1000) views=int(views/1000)"K";
+    printf "%-85s %-18s %10s\n", title, uploader, views;
+  }')
+
+  result=$(echo "$formatted" | fzf --ansi \
+    --header "TITLE                                      CHANNEL              VIEWS" \
+    --layout=reverse --border --info=inline)
+
+  [[ -z "$result" ]] && return
+
+  line_num=$(echo "$formatted" | grep -n "^$(echo "$result" | sed 's/[[\.*^$/]/\\&/g')" | head -1 | cut -d: -f1)
+
+  if [[ -n "$line_num" ]]; then
+    video_id=$(echo "$raw_results" | sed -n "${line_num}p" | awk -F'\t' '{print $3}')
+    title=$(echo "$raw_results" | sed -n "${line_num}p" | awk -F'\t' '{print $1}')
+    uploader=$(echo "$raw_results" | sed -n "${line_num}p" | awk -F'\t' '{print $2}')
+    url="https://www.youtube.com/watch?v=$video_id"
+    echo "$(date '+%d.%m.%Y %H:%M:%S')	$title	$uploader	$video_id" >>"$WATCH_HISTORY"
+    play_video "$url" "$title"
+  fi
+}
+
+# ────────────────────── Watch History ──────────────────────
+show_watch_history() {
+  if [[ ! -s "$WATCH_HISTORY" ]]; then
+    echo "History is empty"
+    sleep 1
+    return
+  fi
+
+  result=$(tac "$WATCH_HISTORY" | fzf --ansi \
+    --header "DATE                 TITLE                                      CHANNEL" \
+    --layout=reverse --border --info=inline \
+    --preview 'echo {} | awk -F"\t" "{printf \"Title: %s\nChannel: %s\nDate: %s\n\", \$2, \$3, \$1}"')
+
+  [[ -z "$result" ]] && return
+
+  video_id=$(echo "$result" | awk -F'\t' '{print $NF}')
+  title=$(echo "$result" | awk -F'\t' '{print $2}')
+
+  if [[ -n "$video_id" ]]; then
+    url="https://www.youtube.com/watch?v=$video_id"
+    play_video "$url" "$title"
+  fi
+}
+
+# ────────────────────── Video info caching ──────────────────────
+get_video_info() {
+  local url=$1
+  local cache_file="$CACHE_DIR/$(echo "$url" | md5sum | cut -d' ' -f1).json"
+
+  if [[ -f "$cache_file" ]] && (($(date +%s) - $(stat -c%Y "$cache_file") < 3600)); then
+    cat "$cache_file"
+    return
+  fi
+
+  yt-dlp "$url" --no-warnings --skip-download -j 2>/dev/null |
+    jq -r '{
+      title: .title,
+      channel: .uploader,
+      date: .upload_date,
+      views: .view_count,
+      duration: .duration,
+      description: .description
+    }' >"$cache_file"
+
+  cat "$cache_file"
+}
+
+# ────────────────────── Video playback ──────────────────────
+play_video() {
+  local url=$1
+  local title=$2
+
+  clear
+  echo "⏳ Loading video information..."
+
+  $PLAYER "$url" 2>&1 &
+  local pid=$!
+
+  info=$(get_video_info "$url")
+  if [[ -z "$info" ]]; then
+    wait $pid
+    read -p "Press Enter to continue..."
+    return
+  fi
+
+  title_info=$(echo "$info" | jq -r '.title // "N/A"')
+  channel=$(echo "$info" | jq -r '.channel // "N/A"')
+  date=$(echo "$info" | jq -r '.date // "N/A"')
+  views=$(echo "$info" | jq -r '.views // "N/A"')
+  duration=$(echo "$info" | jq -r '.duration // 0')
+  description=$(echo "$info" | jq -r '.description // ""')
+
+  # date format
+  if [[ "$date" =~ ^[0-9]{8}$ ]]; then
+    date="${date:6:2}.${date:4:2}.${date:0:4}"
+  else
+    date="N/A"
+  fi
+
+  # views format
+  if [[ "$views" != "null" && -n "$views" && "$views" != "N/A" ]]; then
+    if ((views >= 1000000)); then
+      views="$((views / 1000000))M"
+    elif ((views >= 1000)); then
+      views="$((views / 1000))K"
+    fi
+  else
+    views="N/A"
+  fi
+
+  # duration format
+  if [[ "$duration" =~ ^[0-9]+$ && "$duration" -gt 0 ]]; then
+    mins=$((duration / 60))
+    secs=$((duration % 60))
+    duration_fmt=$(printf "%02d:%02d" "$mins" "$secs")
+  else
+    duration_fmt="N/A"
+  fi
+
+  clear
+  printf '━%.0s' {1..63}
+  echo
+  printf "Title: %s\n" "$title_info"
+  printf "Channel: %s\n" "$channel"
+  printf "Date: %s\n" "$date"
+  printf "Views: %s\n" "$views"
+  printf "Duration: %s\n" "$duration_fmt"
+  printf '━%.0s' {1..63}
+  echo
+
+  if [[ -n "$description" && "$description" != "null" ]]; then
+    echo
+    echo "───────────── Description ─────────────"
+    printf "%b\n" "$description" | head -30
+    echo "───────────────────────────────────"
+  fi
+
+  echo
+  echo "▶ Playing video..."
+  wait $pid
+  echo
+  read -p "Press Enter to continue..."
+}
+
+# ────────────────────── Add playlist ──────────────────────
+add_playlist() {
+  echo "📂 Select an existing playlist or enter a new URL:"
+  existing=$(ls "$PLAYLISTS_DIR" 2>/dev/null | sed 's/^/▶ /' | fzf --ansi --height=10 --border \
+    --header="↑/↓ – select, Enter – open, <Esc> – enter new URL")
+  if [[ -n "$existing" ]]; then
+    pl_file="${PLAYLISTS_DIR}/${existing#▶ }"
+  else
+    read -p "Playlist URL: " pl_url
+    [[ -z "$pl_url" ]] && {
+      echo "❌ URL not specified"
+      return
+    }
+
+    pl_hash=$(echo -n "$pl_url" | md5sum | cut -d' ' -f1)
+    pl_file="${PLAYLISTS_DIR}/${pl_hash}.txt"
+
+    if [[ ! -f "$pl_file" ]]; then
+      echo "🔎 Fetching video list..."
+      yt-dlp --flat-playlist -J "$pl_url" 2>/dev/null |
+        jq -r '.entries[].id' >"$pl_file"
+      if [[ ! -s "$pl_file" ]]; then
+        echo "❌ Failed to fetch list"
+        rm -f "$pl_file"
+        return
+      fi
+      echo "✅ Playlist saved: $pl_file"
+    else
+      echo "ℹ️ Playlist has already been saved"
+    fi
+  fi
+
+  while IFS= read -r vid; do
+    url="https://www.youtube.com/watch?v=$vid"
+    title=$(yt-dlp -e "$url" 2>/dev/null || echo "Video $vid")
+    echo "$(date '+%d.%m.%Y %H:%M:%S')	$title	$(yt-dlp -O "%(uploader)s" "$url")	$vid" >>"$WATCH_HISTORY"
+    play_video "$url" "$title"
+  done <"$pl_file"
+}
+
+# ────────────────────── Initialization ──────────────────────
+check_dependencies
+
+# ────────────────────── Main menu loop ──────────────────────
+while true; do
+  clear
+  cat <<"EOF"
+┌──────────────────────────────┐
+│   🎬 YouTube CLI Player      │
+│                              │
+│  1) 🔍 Search                │
+│  2) 📜 History               │
+│  3) 📂 Add Playlist          │
+│  q) Exit                     │
+└──────────────────────────────┘
+EOF
+  echo
+  read -p ">> " choice
+
+  case $choice in
+  1)
+    read -p "Search: " query
+    [[ "$query" == "!" ]] && query=$(tac "$HISTORY_FILE" 2>/dev/null | fzf --header="Search History")
+    [[ -n "$query" ]] && {
+      echo "$query" >>"$HISTORY_FILE"
+      search_youtube "$query"
+    }
+    ;;
+  2) show_watch_history ;;
+  3) add_playlist ;;
+  q)
+    clear
+    exit 0
+    ;;
+  *)
+    echo "❌ Error"
+    sleep 1
+    ;;
+  esac
+done
